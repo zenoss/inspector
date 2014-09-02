@@ -64,7 +64,7 @@ def selfupdate():
     os.kill(PID, signal.SIGKILL)
 
 def main():
-    b.run(host='0.0.0.0', port="8080", reloader=False)
+    b.run(host='0.0.0.0', port="1774", reloader=False)
 
 if __name__ == '__main__':
     main()

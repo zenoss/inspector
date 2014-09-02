@@ -1,6 +1,6 @@
-INSPECTOR_HOSTNAME="localhost"
-INSPECTOR_PORT="8080" # Set this to -1 for no port.
-INSPECTOR_HOST="http://localhost:8080"
+INSPECTOR_HOSTNAME="zenpip.zendev.org"
+INSPECTOR_PORT="1774"
+INSPECTOR_HOST="http://zenpip.zendev.org:1774"
 
 cd /tmp
 sudo rm -rf inspector inspector.tar.gz
