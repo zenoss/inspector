@@ -7,8 +7,10 @@
     <body>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12" style="background-color:#333333">
-                    <h1 style="color:white; margin: 8px">Zenoss Inspector</h1>
+                <div class="col-md-12" style="background-color:#333333; padding: 8px">
+                    <a href="/">
+                        <img height="39" src="/static/img/zenoss_logo_trans.png">
+                    </a>
                 </div>
             </div>
             <div class="row">

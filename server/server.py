@@ -72,9 +72,9 @@ def selfupdate():
     os.system('cd %s; git pull; rm -rf server/static/inspector.tar.gz; tar -czvf server/static/inspector.tar.gz inspector' % \
         os.path.join(ROOT_PATH, '..'))
     os.kill(PID, signal.SIGTERM)
-    print "Giving bottle a good 10 seconds to terminate gracefully."
-    time.sleep("10")
-    print "Mercilessly killing bottle."
+    print "Giving inspector a good 10 seconds to terminate gracefully."
+    time.sleep(10)
+    print "Mercilessly killing inspector."
     os.kill(PID, signal.SIGKILL)
 
 def parse_args():
