@@ -17,7 +17,7 @@
                 <div class="col-md-2" style="margin-top:20px; height: 100%">
                     <ul class="list-unstyled">
                         % for row in rows:
-                            <li><span class="btn btn-link" onclick="showpanel('{{row[0]}}-panel')">{{row[0]}}</span></li>
+                            <li><span class="btn btn-link" style="padding-bottom: 0px; padding-top: 0px;" onclick="showpanel('{{row[0]}}-panel')">{{row[0]}}</span></li>
                         % end
                     </ul>
                 </div>
@@ -31,10 +31,10 @@
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane active" id="{{row[0]}}-stdout">
-                                    <pre style="border: none; border-radius: 0px">{{row[2]}}</pre>
+                                    <pre style="border-top: none; border-radius: 0px">{{row[2]}}</pre>
                                 </div>
                                 <div class="tab-pane" id="{{row[0]}}-stderr">
-                                    <pre style="border: none; border-radius: 0px">{{row[3]}}</pre>
+                                    <pre style="border-top: none; border-radius: 0px">{{row[3]}}</pre>
                                 </div>
                             </div>
                         </div>
