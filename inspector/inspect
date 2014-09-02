@@ -3,6 +3,7 @@
 import glob
 import httplib
 import os
+import stat
 import urllib
 import uuid
 import datetime
@@ -57,6 +58,7 @@ def main():
     print colored("Inspecting. View results at", "green"), colored(get_url(), "green", attrs=["bold"])
     scripts = get_scripts()
     for script in scripts:
+        os.chmod(script, stat.S_IEXEC)
         print colored("Running", "blue"), colored(script, "blue", attrs=['bold'])
         try:
             p = Popen(script, stdout=PIPE, stderr=PIPE)
