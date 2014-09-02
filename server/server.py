@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
+import argparse
 import os
 import sqlite3
 import sys
 import signal
+import time
 
 import bottle as b
 b.BaseRequest.MEMFILE_MAX = 1024 * 1024 * 128 #128MB max file size
+
+HOSTNAME = "localhost"
+PORT = "8080"
 
 ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 STATIC_PATH = os.path.join(ROOT_PATH, 'static')
@@ -56,15 +61,34 @@ def inspection(token):
     rows = sorted(cur.fetchall(), key=lambda x: x[0])
     return b.template('inspection.tpl', rows=rows)
 
+@b.route('/bootstrap')
+def bootstrap():
+    b.response.content_type = "text/plain"
+    return b.template('bootstrap.tpl', hostname=HOSTNAME, port=PORT)
+
+
 @b.route('/selfupdate')
 def selfupdate():
     os.system('cd %s; git pull; rm -rf server/static/inspector.tar.gz; tar -czvf server/static/inspector.tar.gz inspector' % \
         os.path.join(ROOT_PATH, '..'))
     os.kill(PID, signal.SIGTERM)
+    print "Giving bottle a good 10 seconds to terminate gracefully."
+    time.sleep("10")
+    print "Mercilessly killing bottle."
     os.kill(PID, signal.SIGKILL)
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", "-o", default="localhost")
+    parser.add_argument("--port", "-p", default="8080")
+    return parser.parse_args()
+
 def main():
-    b.run(host='0.0.0.0', port="1774", reloader=False)
+    global HOSTNAME, PORT
+    args = parse_args()
+    HOSTNAME = args.host
+    PORT = args.port
+    b.run(host=HOSTNAME, port=PORT, reloader=False)
 
 if __name__ == '__main__':
     main()
