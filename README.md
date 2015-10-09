@@ -28,7 +28,7 @@ Cleaning up...
 
 ### Adding a collector script.
 If you're a dev and you find that you frequently need some set of data from installations you're
-debugging, just clone out the inspector repo, add a script to ```collect``` folder, and push.
+debugging, just clone the inspector repo, add a script to the ```collect``` folder, and push.
 The next time someone runs the inspection, it'll run your script and save its stdout/err.
 
 By way of example:
