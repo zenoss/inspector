@@ -1,0 +1,174 @@
+#!/usr/bin/env python
+
+"""Zenoss Inspector"""
+
+import os
+import sys
+import glob
+import argparse
+import traceback
+import shutil
+from datetime import datetime
+from subprocess import Popen, PIPE, CalledProcessError, check_call
+
+from termcolor import colored
+
+PATH = os.path.dirname(os.path.abspath(__file__))
+COLLECT = os.path.join(PATH, "collect")
+PROCESS = os.path.join(PATH, "process")
+RESULT = "inspected-%s" % datetime.today().isoformat().replace(":", "-")
+LOGFILE = os.path.join(RESULT, "inspector.log")
+
+ZI_TAGS = "zenoss-inspector-tags"
+ZI_DEPS = "zenoss-inspector-deps"
+
+
+class Collector(object):
+
+    def __init__(self, script):
+        self.script = script
+        self.basename = os.path.basename(script)
+        self.tags = []
+        self.load_tags()
+
+    def load_tags(self):
+        with open(self.script, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if ZI_TAGS in line:
+                    self.tags = line[line.index(ZI_TAGS) + len(ZI_TAGS):].strip().split()
+                    return
+
+    def run(self):
+        p = Popen(self.script, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate()
+        return stdout, stderr, p.returncode
+
+    def store_result(self, stdout, stderr, result_path):
+        fout = os.path.join(result_path, self.basename + ".stdout")
+        with open(fout, 'w') as f:
+            f.write(stdout)
+        if len(stderr) > 0:
+            ferr = os.path.join(result_path, self.basename + ".stderr")
+            with open(ferr, 'w') as f:
+                f.write(stderr)
+
+
+class Processor(object):
+
+    def __init__(self, script):
+        self.script = script
+        self.has_run = False
+        self.basename = os.path.basename(script)
+        self.deps = []
+        self.load_dependencies()
+
+    def load_dependencies(self):
+        with open(self.script, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if ZI_DEPS in line:
+                    self.deps = line[line.index(ZI_DEPS) + len(ZI_DEPS):].strip().split()
+                    return
+
+    def run(self):
+        self.has_run = True
+        p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=RESULT)
+        stdout, stderr = p.communicate()
+        return stdout, stderr, p.returncode
+
+
+def log(msg, color=None, attrs=None, end=True, tty=True):
+    # Logic here could be cleaner, but I'm in a hurry.
+    if sys.stdout.isatty():
+        fmtd = colored(msg, color, attrs=attrs)
+    else:
+        fmtd = msg
+    if end and tty:
+        print fmtd
+    elif tty:
+        print fmtd,
+    with open(LOGFILE, 'a') as f:
+        if end:
+            msg += "\n"
+        f.write(msg.encode("utf-8"))
+
+def get_collectors():
+    raw = glob.glob(os.path.join(COLLECT, "*"))
+    return [Collector(c) for c in raw if os.path.isfile(c)]
+
+def get_processors():
+    raw = glob.glob(os.path.join(PROCESS, "*"))
+    return [Processor(c) for c in raw if os.path.isfile(c)]
+
+def create_result_dir():
+    os.mkdir(RESULT)
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Inspect a Zenoss installation.")
+    parser.add_argument("--no-remove", action="store_true", default=False,
+                        help="Don't remove untarred directory.")
+    tags = parser.add_mutually_exclusive_group()
+    tags.add_argument("-w", "--whitelist", nargs="+", help="Use only these tags.")
+    tags.add_argument("-b", "--blacklist", nargs="+", help="Don't use these tags.")
+    return parser.parse_args()
+
+def main():
+    args = get_args()
+    create_result_dir()
+    collectors = get_collectors()
+    collected = []
+    processors = get_processors()
+    need_collecting_header = True
+    padding = max([len(c.basename) for c in collectors]) + 4
+    for collector in collectors:
+
+        if need_collecting_header:
+            log("\nCollecting...", "blue", attrs=["bold"])
+            need_collecting_header = False
+
+        if args.whitelist:
+            if not any(t in args.whitelist for t in collector.tags):
+                continue
+
+        if args.blacklist:
+            if any(t in args.blacklist for t in collector.tags):
+                continue
+
+        log(collector.basename.ljust(padding), "blue", end=False)
+
+        try:
+
+            stdout, stderr, retcode = collector.run()
+
+            collector.store_result(stdout, stderr, RESULT)
+
+            if retcode != 0:
+                raise CalledProcessError(retcode, collector.basename)
+
+            collected.append(collector.basename)
+
+            log(u'\u2713', "blue")
+
+        except Exception, e: #pylint: disable=broad-except
+            log("X    %s" % str(e), "red")
+            log(traceback.format_exc(), tty=False)
+
+        for p in processors:
+            ready = all(dep in collected for dep in p.deps)
+            if ready and not p.has_run:
+                stdout, stderr, retcode = p.run()
+                if len(stdout) > 0:
+                    need_collecting_header = True
+                    log("\n%s:" % p.basename, "red", attrs=["bold", "dark"])
+                    log("%s\n" % stdout.strip(), "red", attrs=["dark"])
+
+    log("\nCompressing results: %s" % RESULT + ".tar.gz", "blue", attrs=["bold"])
+    check_call(["tar", "-czf", RESULT + ".tar.gz", RESULT])
+
+    if not args.no_remove:
+        log("Cleaning up...", "blue", attrs=["bold"])
+        shutil.rmtree(RESULT)
+
+if __name__ == "__main__":
+    main()
