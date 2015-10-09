@@ -1,5 +1,5 @@
 # Zenoss Inspector
-To inspect a host, simply run the following:
+To inspect a host, simply run the following on that host:
 
 ```bash
 $ wget -q -O - https://raw.githubusercontent.com/zenoss/inspector/master/bootstrap.sh | sudo sh
