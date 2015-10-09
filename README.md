@@ -90,8 +90,6 @@ Then, the next time somebody runs the inspector via the onliner above:
 ```bash
 $ wget -q -O - https://raw.githubusercontent.com/zenoss/inspector/master/bootstrap.sh | sudo sh
 
-$ ./inspect
-
 Collecting...
 etchosts.sh                  ✓
 dfinode.sh                   ✓
