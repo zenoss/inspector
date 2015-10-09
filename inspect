@@ -108,6 +108,8 @@ def get_args():
     parser = argparse.ArgumentParser(description="Inspect a Zenoss installation.")
     parser.add_argument("--no-remove", action="store_true", default=False,
                         help="Don't remove untarred directory.")
+    parser.add_argument("--no-save", action="store_true", default=False,
+                        help="Don't compress results.")
     tags = parser.add_mutually_exclusive_group()
     tags.add_argument("-w", "--whitelist", nargs="+", help="Use only these tags.")
     tags.add_argument("-b", "--blacklist", nargs="+", help="Don't use these tags.")
@@ -163,8 +165,11 @@ def main():
                     log("\n%s:" % p.basename, "red", attrs=["bold", "dark"])
                     log("%s\n" % stdout.strip(), "red", attrs=["dark"])
 
-    log("\nCompressing results: %s" % RESULT + ".tar.gz", "blue", attrs=["bold"])
-    check_call(["tar", "-czf", RESULT + ".tar.gz", RESULT])
+    log("")
+
+    if not args.no_save:
+        log("Compressing results: %s" % RESULT + ".tar.gz", "blue", attrs=["bold"])
+        check_call(["tar", "-czf", RESULT + ".tar.gz", RESULT])
 
     if not args.no_remove:
         log("Cleaning up...", "blue", attrs=["bold"])
