@@ -7,7 +7,7 @@ $ wget -q -O - https://raw.githubusercontent.com/zenoss/inspector/master/bootstr
 
 Inspection results will be printed to stdout, and complete logs will be compressed and stored in
 a dated file that looks like ```inspected-2015-10-09T12-48-47.054684.tar.gz```. If inspector detects
-any problems with your inspection, it will inform you at runtime.
+any problems during your inspection, it will inform you at runtime.
 
 ```
 Collecting...
