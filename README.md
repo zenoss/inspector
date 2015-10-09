@@ -1,5 +1,5 @@
 # Zenoss Inspector
-To inspect a host, simply run the following:
+To inspect a host, simply run the following on that host:
 
 ```bash
 $ wget -q -O - https://raw.githubusercontent.com/zenoss/inspector/master/bootstrap.sh | sudo sh
@@ -7,7 +7,7 @@ $ wget -q -O - https://raw.githubusercontent.com/zenoss/inspector/master/bootstr
 
 Inspection results will be printed to stdout, and complete logs will be compressed and stored in
 a dated file that looks like ```inspected-2015-10-09T12-48-47.054684.tar.gz```. If inspector detects
-any problems with your inspection, it will inform you at runtime.
+any problems during your inspection, it will inform you at runtime.
 
 ```
 Collecting...
@@ -28,7 +28,7 @@ Cleaning up...
 
 ### Adding a collector script.
 If you're a dev and you find that you frequently need some set of data from installations you're
-debugging, just clone out the inspector repo, add a script to ```collect``` folder, and push.
+debugging, just clone the inspector repo, add a script to the ```collect``` folder, and push.
 The next time someone runs the inspection, it'll run your script and save its stdout/err.
 
 By way of example:
@@ -89,8 +89,6 @@ Then, the next time somebody runs the inspector via the onliner above:
 
 ```bash
 $ wget -q -O - https://raw.githubusercontent.com/zenoss/inspector/master/bootstrap.sh | sudo sh
-
-$ ./inspect
 
 Collecting...
 etchosts.sh                  ✓
