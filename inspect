@@ -92,6 +92,7 @@ def log(msg, color=None, attrs=None, end=True, tty=True):
         if end:
             msg += "\n"
         f.write(msg.encode("utf-8"))
+    sys.stdout.flush()
 
 def get_collectors():
     raw = glob.glob(os.path.join(COLLECT, "*"))
