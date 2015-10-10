@@ -151,7 +151,7 @@ def main():
 
             collected.append(collector.basename)
 
-            log(u'\u2713', "blue")
+            log(u'\u2713', "green")
 
         except Exception, e: #pylint: disable=broad-except
             log("X    %s" % str(e), "red")
