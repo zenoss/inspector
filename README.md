@@ -143,16 +143,16 @@ into it:
 ps aux
 ```
 
-Now let's run the inspector like this:
+Now let's run inspector like this:
 
 ```bash
 $ ./inspect --no-save --no-remove -w process
 ps-aux.sh     done
 ```
 
-Here we're instructing the inspector to not create a tarball (```--no-save```), not remove the
+Here we're instructing inspector to not create a tarball (```--no-save```), not remove the
 working directory (```--no-remove```) and to whitelist scripts tagged ```process```, which is what we
-tagged our script with. The inspector indicates that our script was run. We should now have a new
+tagged our script with. Inspector indicates that our script was run. We should now have a new
 directory that looks something like ```inspected-2015-10-11T11-18-11.347149```, and inside we should
 see at least two files: ```ps-aux.sh.stdout``` and ```inspector.log```.
 
@@ -181,16 +181,16 @@ fi
 ```
 
 Take a look at the ```zenoss-inspector-*``` tags weve added. ```zenoss-inspector-info``` instructs
-the inspector to direct the stdout of this script immediately to the user.
+inspector to direct the stdout of this script immediately to the user.
 ```zenoss-inspector-tags process docker``` tags our new script ```process``` and ```docker```.
 ```zenoss-inspector-deps ps-aux.sh``` instructs inspector to wait for the ```ps-aux.sh``` script
 to finish executing successfully before kicking off our new script.
 
 Note that this script is looking in ```ps-aux.sh.stdout``` in the current working directory. Collector
-script output files are appended with ```.stdout``` or ```.stderr```, and all scripts are executed
+script output filenames are appended with ```.stdout``` or ```.stderr```, and all scripts are executed
 within the directory that contains those output files.
 
-Now let's run the inspector again:
+Now let's run inspector again:
 ```bash
 ./inspect --no-save --no-remove -w process
 ps-aux.sh             done
