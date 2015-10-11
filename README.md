@@ -39,7 +39,7 @@ Cleaning up...
 Inspections can be performed with a handful of options. To use inspector in this fashion, just
 download the master branch, unzip it, and run inspect:
 
-```bash
+```
 $ wget -q https://github.com/zenoss/inspector/archive/master.zip
 $ unzip -q master.zip
 $ cd inspector-master
@@ -191,7 +191,7 @@ script output filenames are appended with ```.stdout``` or ```.stderr```, and al
 within the directory that contains those output files.
 
 Now let's run inspector again:
-```bash
+```
 ./inspect --no-save --no-remove -w process
 ps-aux.sh             done
 docker-running.sh     done
@@ -199,7 +199,7 @@ docker-running.sh     done
 
 Looks good. If I stop docker and run it again:
 
-```bash
+```
 $ sudo stop docker
 docker stop/waiting
 
