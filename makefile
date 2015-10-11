@@ -10,5 +10,11 @@ lint:
 exe:
 	@chmod +x collect/* process/*
 
+test:
+	@./tests/test
+
+save-test:
+	@./tests/test --save
+
 default:
 	@echo "There's nothing to build here, this is just a utility makefile."

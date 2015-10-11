@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# zenoss-inspector-info
 # zenoss-inspector-deps ps-aux.sh
 
 grep "docker -d" ps-aux.sh.stdout &>/dev/null
