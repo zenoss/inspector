@@ -1,0 +1,116 @@
+#!/usr/bin/env python
+
+import os
+import glob
+import shutil
+import argparse
+import subprocess as sp
+
+PATH = os.path.dirname(os.path.abspath(__file__))
+CASES = os.path.join(PATH, "cases")
+TEMPOUT = os.path.join(PATH, "temp-out")
+
+
+def load_cases():
+    paths = glob.glob(os.path.join(CASES, "*"))
+    return [p for p in paths if os.path.isdir(p)]
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Inspect a Zenoss installation.")
+    parser.add_argument("--save", action="store_true", default=False,
+                        help="Save the results of the executed tests.")
+    return parser.parse_args()
+
+def cleanup():
+    if os.path.isdir(TEMPOUT):
+        shutil.rmtree(TEMPOUT)
+
+def path_to_string(path):
+    string = ""
+    if os.path.isdir(path):
+        g = glob.glob(os.path.join(path, "*"))
+        g = sorted(g)
+        string += ' '.join([os.path.basename(p) for p in g]) + "\n"
+        for p in g:
+            string += path_to_string(p)
+    elif os.path.isfile(path):
+        with open(path, 'r') as f:
+            string += f.read()
+    else:
+        raise ValueError
+    return string
+
+
+def main():
+
+    args = get_args()
+    cases = load_cases()
+
+    cleanup()
+
+    for case in cases:
+
+        if os.path.isfile(os.path.join(case, "skip")):
+            print "Skipping %s." % os.path.basename(case)
+            continue
+
+        print "Running %s." % os.path.basename(case)
+
+        env = os.environ.copy()
+        env["ZI_SCRIPTS"] = os.path.join(case, "scripts")
+        env["ZI_RESULTS"] = TEMPOUT
+        with open(os.path.join(case, "command"), 'r') as f:
+            command = ''.join(f.readlines()).strip().split()
+        command = ["./inspect", "--no-save", "--no-remove"] + command
+
+        p = sp.Popen(command, env=env, stderr=sp.PIPE, stdout=sp.PIPE)
+        stdout, stderr = p.communicate()
+
+        expected = os.path.join(case, "results")
+
+        if args.save:
+            if os.path.isdir(expected):
+                shutil.rmtree(expected)
+            os.mkdir(expected)
+            with open(os.path.join(expected, "stdout"), 'w') as f:
+                f.write(stdout)
+            with open(os.path.join(expected, "stderr"), 'w') as f:
+                f.write(stderr)
+            if p.returncode == 0:
+                shutil.copytree(TEMPOUT, os.path.join(expected, "inspected"))
+            cleanup()
+            continue
+
+        with open(os.path.join(expected, "stdout"), 'r') as f:
+            expected_stdout = f.read()
+        if stdout != expected_stdout:
+            print "expected:"
+            print expected_stdout
+            print "got:"
+            print stdout
+            raise Exception("stdout is unexpected")
+        with open(os.path.join(expected, "stderr"), 'r') as f:
+            expected_stderr = f.read()
+        if stderr != expected_stderr:
+            print "expected:"
+            print expected_stderr
+            print "got:"
+            print stderr
+            raise Exception("stderr is unexpected")
+
+
+        if p.returncode == 0:
+            expected_inspected = path_to_string(os.path.join(expected, "inspected"))
+            inspected = path_to_string(TEMPOUT)
+            if inspected != expected_inspected:
+                print "expected:"
+                print expected_inspected
+                print "got:"
+                print inspected
+                raise Exception("inspected is unexpected")
+
+        cleanup()
+
+
+if __name__ == "__main__":
+    main()
