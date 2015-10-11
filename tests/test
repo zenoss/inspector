@@ -46,6 +46,8 @@ def main():
     args = get_args()
     cases = load_cases()
 
+    padding = max(len(os.path.basename(c)) for c in cases) + 4
+
     cleanup()
 
     for case in cases:
@@ -54,7 +56,7 @@ def main():
             print "Skipping %s." % os.path.basename(case)
             continue
 
-        print "Running %s." % os.path.basename(case)
+        print os.path.basename(case).ljust(padding),
 
         env = os.environ.copy()
         env["ZI_SCRIPTS"] = os.path.join(case, "scripts")
@@ -108,6 +110,8 @@ def main():
                 print "got:"
                 print inspected
                 raise Exception("inspected is unexpected")
+
+        print "pass"
 
         cleanup()
 
