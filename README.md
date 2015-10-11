@@ -21,7 +21,7 @@ ps-aux.sh                    done
 diskspace.py                 done
 The following filesystems are >= 90% full:
 Filesystem     Type             Size  Used Avail Use% Mounted on
-/dev/sda1      ext4              30G   12G   17G  97% /
+/dev/sda1      ext4              30G   29G    1G  97% /
 docker-version.sh            done
 etchosts.sh                  done
 docker-container-logs.py     done
@@ -67,9 +67,9 @@ files. Info scripts are a little different - their output is printed to stdout i
 The purpose of info scripts is to inform the user that something may need investigating. Examples
 include checking for full disks, excessive memory usage, or errors in logs.
 
-### Script tags
-Tags can be added to inspector scripts to indicate how they should be used. Add a tag to a script
-by simply adding a comment with the tag in it. See examples below.
+### Script directives
+Directives can be added to inspector scripts to indicate how they should be used. Add a directive to a script
+by simply adding a comment with the directive in it. See examples below.
 
 #### zenoss-inspector-tags
 Add a comment to your script with ```zenoss-inspector-tags``` followed by a space-separated list of
@@ -180,7 +180,7 @@ if [ $? -ne 0 ]
 fi
 ```
 
-Take a look at the ```zenoss-inspector-*``` tags weve added. ```zenoss-inspector-info``` instructs
+Take a look at the ```zenoss-inspector-*``` directives weve added. ```zenoss-inspector-info``` instructs
 inspector to direct the stdout of this script immediately to the user.
 ```zenoss-inspector-tags process docker``` tags our new script ```process``` and ```docker```.
 ```zenoss-inspector-deps ps-aux.sh``` instructs inspector to wait for the ```ps-aux.sh``` script
