@@ -1,0 +1,2 @@
+a.sh ['b.sh'] ['a.sh', 'c.sh']
+c.sh     done

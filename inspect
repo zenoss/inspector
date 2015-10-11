@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-"""Zenoss Inspector"""
-
 import os
 import sys
 import glob
@@ -14,33 +12,50 @@ from subprocess import Popen, PIPE, CalledProcessError, check_call
 from termcolor import colored
 
 PATH = os.path.dirname(os.path.abspath(__file__))
-COLLECT = os.path.join(PATH, "collect")
-PROCESS = os.path.join(PATH, "process")
-RESULT = "inspected-%s" % datetime.today().isoformat().replace(":", "-")
-LOGFILE = os.path.join(RESULT, "inspector.log")
+SCRIPTS = os.environ.get("ZI_SCRIPTS") or os.path.join(PATH, "scripts")
+RESULTS = os.environ.get("ZI_RESULTS") or "inspected-%s" % datetime.today().isoformat().replace(":", "-")
+LOGFILE = os.path.join(RESULTS, "inspector.log")
 
 ZI_TAGS = "zenoss-inspector-tags"
 ZI_DEPS = "zenoss-inspector-deps"
+ZI_INFO = "zenoss-inspector-info"
 
-
-class Collector(object):
+class Script(object):
 
     def __init__(self, script):
         self.script = script
         self.basename = os.path.basename(script)
         self.tags = []
         self.load_tags()
+        self.deps = []
+        self.load_dependencies()
+        self.info = self.get_info_tag()
 
     def load_tags(self):
         with open(self.script, 'r') as f:
             lines = f.readlines()
-            for line in lines:
-                if ZI_TAGS in line:
-                    self.tags = line[line.index(ZI_TAGS) + len(ZI_TAGS):].strip().split()
-                    return
+        for line in lines:
+            if ZI_TAGS in line:
+                self.tags = line[line.index(ZI_TAGS) + len(ZI_TAGS):].strip().split()
+                return
+
+    def load_dependencies(self):
+        with open(self.script, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            if ZI_DEPS in line:
+                self.deps = line[line.index(ZI_DEPS) + len(ZI_DEPS):].strip().split()
+                return
+
+    def get_info_tag(self):
+        with open(self.script, 'r') as f:
+            raw = ''.join(f.readlines())
+        if ZI_INFO in raw:
+            return True
+        return False
 
     def run(self):
-        p = Popen(self.script, stdout=PIPE, stderr=PIPE)
+        p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=RESULTS)
         stdout, stderr = p.communicate()
         return stdout, stderr, p.returncode
 
@@ -52,30 +67,6 @@ class Collector(object):
             ferr = os.path.join(result_path, self.basename + ".stderr")
             with open(ferr, 'w') as f:
                 f.write(stderr)
-
-
-class Processor(object):
-
-    def __init__(self, script):
-        self.script = script
-        self.has_run = False
-        self.basename = os.path.basename(script)
-        self.deps = []
-        self.load_dependencies()
-
-    def load_dependencies(self):
-        with open(self.script, 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if ZI_DEPS in line:
-                    self.deps = line[line.index(ZI_DEPS) + len(ZI_DEPS):].strip().split()
-                    return
-
-    def run(self):
-        self.has_run = True
-        p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=RESULT)
-        stdout, stderr = p.communicate()
-        return stdout, stderr, p.returncode
 
 
 def log(msg, color=None, attrs=None, end=True, tty=True):
@@ -94,16 +85,9 @@ def log(msg, color=None, attrs=None, end=True, tty=True):
         f.write(msg.encode("utf-8"))
     sys.stdout.flush()
 
-def get_collectors():
-    raw = glob.glob(os.path.join(COLLECT, "*"))
-    return [Collector(c) for c in raw if os.path.isfile(c)]
-
-def get_processors():
-    raw = glob.glob(os.path.join(PROCESS, "*"))
-    return [Processor(c) for c in raw if os.path.isfile(c)]
-
-def create_result_dir():
-    os.mkdir(RESULT)
+def get_scripts():
+    paths = glob.glob(os.path.join(SCRIPTS, "*"))
+    return [Script(s) for s in paths if os.path.isfile(s)]
 
 def get_args():
     parser = argparse.ArgumentParser(description="Inspect a Zenoss installation.")
@@ -118,63 +102,81 @@ def get_args():
 
 def main():
     args = get_args()
-    create_result_dir()
-    collectors = get_collectors()
-    collected = []
-    processors = get_processors()
-    need_collecting_header = True
-    padding = max([len(c.basename) for c in collectors]) + 4
-    for collector in collectors:
+    scripts = get_scripts()
 
-        if need_collecting_header:
-            log("\nCollecting...", "blue", attrs=["bold"])
-            need_collecting_header = False
+    if args.whitelist:
+        scripts = [s for s in scripts if any(t in args.whitelist for t in s.tags)]
+    elif args.blacklist:
+        scripts = [s for s in scripts if not any(t in args.blacklist for t in s.tags)]
 
-        if args.whitelist:
-            if not any(t in args.whitelist for t in collector.tags):
+    padding = max([len(s.basename) for s in scripts]) + 4
+
+    os.mkdir(RESULTS)
+
+    completed_scriptnames = []
+
+    last_len = None
+
+    while len(scripts) > 0:
+
+        # Detect circular dependencies.
+        if len(scripts) == last_len:
+            log("Circular dependency detected, aborting.", "red", attrs=["bold"])
+            log(' '.join(s.basename for s in scripts), "red")
+            break
+        last_len = len(scripts)
+
+        for script in scripts[:]:
+
+            # Make a list of all scripts that have been run successfully and that are planned to run.
+            all_scripts = completed_scriptnames + [s.basename for s in scripts]
+
+            # If the deps for this script will never be met, remove it from the list and continue
+            # to the next.
+            if not all(d in all_scripts for d in script.deps):
+                print script.basename, script.deps, all_scripts
+                scripts.remove(script)
                 continue
 
-        if args.blacklist:
-            if any(t in args.blacklist for t in collector.tags):
+            # If we haven't met the deps for this script yet, continue to the next one.
+            if not all(d in completed_scriptnames for d in script.deps):
                 continue
 
-        log(collector.basename.ljust(padding), "blue", end=False)
+            # All deps met, let's run this script. No matter what happens next, we don't want this
+            # in our to-exectute script list anymore.
+            scripts.remove(script)
 
-        try:
+            log(script.basename.ljust(padding), "blue", end=False)
 
-            stdout, stderr, retcode = collector.run()
+            # Run the script.
+            stdout, stderr, retcode = script.run()
 
-            collector.store_result(stdout, stderr, RESULT)
+            # Indicate script pass/fail.
+            if retcode == 0:
+                log("done", "blue")
+            else:
+                log("X", "red")
 
-            if retcode != 0:
-                raise CalledProcessError(retcode, collector.basename)
-
-            collected.append(collector.basename)
-
-            log(u'\u2713', "green")
-
-        except Exception, e: #pylint: disable=broad-except
-            log("X    %s" % str(e), "red")
-            log(traceback.format_exc(), tty=False)
-
-        for p in processors:
-            ready = all(dep in collected for dep in p.deps)
-            if ready and not p.has_run:
-                stdout, stderr, retcode = p.run()
+            if script.info:
                 if len(stdout) > 0:
-                    need_collecting_header = True
-                    log("\n%s:" % p.basename, "red", attrs=["bold", "dark"])
-                    log("%s\n" % stdout.strip(), "red", attrs=["dark"])
+                    log(stdout.strip(), "red")
+                if len(stderr) > 0:
+                    log("Error running %s" % script.basename, "red", attrs=["bold"])
+                    log(stderr.strip(), "red")
+            else:
+                script.store_result(stdout, stderr, RESULTS)
 
-    log("")
+            if retcode == 0:
+                completed_scriptnames.append(script.basename)
 
     if not args.no_save:
-        log("Compressing results: %s" % RESULT + ".tar.gz", "blue", attrs=["bold"])
-        check_call(["tar", "-czf", RESULT + ".tar.gz", RESULT])
+        log("Compressing results: %s" % RESULTS + ".tar.gz", "blue", attrs=["bold"])
+        check_call(["tar", "-czf", RESULTS + ".tar.gz", RESULTS])
 
     if not args.no_remove:
         log("Cleaning up...", "blue", attrs=["bold"])
-        shutil.rmtree(RESULT)
+        shutil.rmtree(RESULTS)
+
 
 if __name__ == "__main__":
     main()
