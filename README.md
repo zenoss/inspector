@@ -180,7 +180,7 @@ if [ $? -ne 0 ]
 fi
 ```
 
-Take a look at the ```zenoss-inspector-*``` directives weve added. ```zenoss-inspector-info``` instructs
+Take a look at the ```zenoss-inspector-*``` directives we've added. ```zenoss-inspector-info``` instructs
 inspector to direct the stdout of this script immediately to the user.
 ```zenoss-inspector-tags process docker``` tags our new script ```process``` and ```docker```.
 ```zenoss-inspector-deps ps-aux.sh``` instructs inspector to wait for the ```ps-aux.sh``` script
