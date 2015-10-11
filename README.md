@@ -13,7 +13,7 @@ Inspection results will be printed to stdout, and complete logs will be compress
 a dated file that looks like ```inspected-2015-10-09T12-48-47.054684.tar.gz```. If inspector detects
 any problems during your inspection, it will inform you at runtime.
 
-```bash
+```
 free.sh                      done
 dfinode.sh                   done
 df.sh                        done
