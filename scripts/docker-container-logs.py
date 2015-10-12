@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# zenoss-inspector-tags slow
+
 import subprocess as sp
 import json
 
