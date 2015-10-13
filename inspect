@@ -7,67 +7,14 @@ import argparse
 import traceback
 import shutil
 from datetime import datetime
-from subprocess import Popen, PIPE, CalledProcessError, check_call
 
 from termcolor import colored
+from script import Script
 
 PATH = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.environ.get("ZI_SCRIPTS") or os.path.join(PATH, "scripts")
 RESULTS = os.environ.get("ZI_RESULTS") or "inspected-%s" % datetime.today().isoformat().replace(":", "-")
 LOGFILE = os.path.join(RESULTS, "inspector.log")
-
-ZI_TAGS = "zenoss-inspector-tags"
-ZI_DEPS = "zenoss-inspector-deps"
-ZI_INFO = "zenoss-inspector-info"
-
-class Script(object):
-
-    def __init__(self, script):
-        self.script = script
-        self.basename = os.path.basename(script)
-        self.tags = []
-        self.load_tags()
-        self.deps = []
-        self.load_dependencies()
-        self.info = self.get_info_tag()
-
-    def load_tags(self):
-        with open(self.script, 'r') as f:
-            lines = f.readlines()
-        for line in lines:
-            if ZI_TAGS in line:
-                self.tags = line[line.index(ZI_TAGS) + len(ZI_TAGS):].strip().split()
-                return
-
-    def load_dependencies(self):
-        with open(self.script, 'r') as f:
-            lines = f.readlines()
-        for line in lines:
-            if ZI_DEPS in line:
-                self.deps = line[line.index(ZI_DEPS) + len(ZI_DEPS):].strip().split()
-                return
-
-    def get_info_tag(self):
-        with open(self.script, 'r') as f:
-            raw = ''.join(f.readlines())
-        if ZI_INFO in raw:
-            return True
-        return False
-
-    def run(self):
-        p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=RESULTS)
-        stdout, stderr = p.communicate()
-        return stdout, stderr, p.returncode
-
-    def store_result(self, stdout, stderr, result_path):
-        fout = os.path.join(result_path, self.basename + ".stdout")
-        with open(fout, 'w') as f:
-            f.write(stdout)
-        if len(stderr) > 0:
-            ferr = os.path.join(result_path, self.basename + ".stderr")
-            with open(ferr, 'w') as f:
-                f.write(stderr)
-
 
 def log(msg, color=None, attrs=None, end=True, tty=True):
     # Logic here could be cleaner, but I'm in a hurry.
@@ -149,7 +96,7 @@ def main():
             log(script.basename.ljust(padding), "blue", end=False)
 
             # Run the script.
-            stdout, stderr, retcode = script.run()
+            stdout, stderr, retcode = script.run(RESULTS)
 
             # Indicate script pass/fail.
             if retcode == 0:
