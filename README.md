@@ -45,14 +45,18 @@ $ unzip -q master.zip
 $ cd inspector-master
 $ ./inspect -h
 
-usage: inspect [-h] [--no-remove] [-w WHITELIST [WHITELIST ...] | -b BLACKLIST
-               [BLACKLIST ...]]
+usage: inspect [-h] [--no-remove] [--no-save] [-j JOBS] [-t TIMEOUT]
+               [-w WHITELIST [WHITELIST ...] | -b BLACKLIST [BLACKLIST ...]]
 
 Inspect a Zenoss installation.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --no-remove           Don't remove untarred directory.
+  --no-remove           Don't remove working directory.
+  --no-save             Don't compress results.
+  -j JOBS, --jobs JOBS  Maximum number of jobs to run in parallel.
+  -t TIMEOUT, --timeout TIMEOUT
+                        Timeout in seconds for entire inspection.
   -w WHITELIST [WHITELIST ...], --whitelist WHITELIST [WHITELIST ...]
                         Use only these tags.
   -b BLACKLIST [BLACKLIST ...], --blacklist BLACKLIST [BLACKLIST ...]

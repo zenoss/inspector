@@ -63,7 +63,7 @@ def main():
         env["ZI_RESULTS"] = TEMPOUT
         with open(os.path.join(case, "command"), 'r') as f:
             command = ''.join(f.readlines()).strip().split()
-        command = ["./inspect", "--no-save", "--no-remove"] + command
+        command = ["./inspect", "--no-save", "--no-remove", "-j1"] + command
 
         p = sp.Popen(command, env=env, stderr=sp.PIPE, stdout=sp.PIPE)
         stdout, stderr = p.communicate()
