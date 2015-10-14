@@ -6,7 +6,9 @@ import glob
 import argparse
 import traceback
 import shutil
+import Queue
 from datetime import datetime
+from subprocess import check_call
 
 from termcolor import colored
 from script import Script
@@ -42,6 +44,7 @@ def get_args():
                         help="Don't remove untarred directory.")
     parser.add_argument("--no-save", action="store_true", default=False,
                         help="Don't compress results.")
+    parser.add_argument("-j", "--jobs", default=0, type=int)
     tags = parser.add_mutually_exclusive_group()
     tags.add_argument("-w", "--whitelist", nargs="+", help="Use only these tags.")
     tags.add_argument("-b", "--blacklist", nargs="+", help="Don't use these tags.")
@@ -60,49 +63,68 @@ def main():
 
     os.mkdir(RESULTS)
 
-    completed_scriptnames = []
+    to_run = scripts
+    have_run = []
+    running = []
 
     last_len = None
 
-    while len(scripts) > 0:
+    queue = Queue.Queue()
 
-        # Detect circular dependencies.
-        if len(scripts) == last_len:
-            log("Circular dependency detected, aborting.", "red", attrs=["bold"])
-            log(' '.join(s.basename for s in scripts), "red")
-            break
-        last_len = len(scripts)
+    while len(to_run) + len(running) > 0:
 
-        for script in scripts[:]:
+        for script in to_run[:]:
 
-            # Make a list of all scripts that have been run successfully and that are planned to run.
-            all_scripts = completed_scriptnames + [s.basename for s in scripts]
+            if len(running) >= args.jobs and args.jobs > 0:
+                break
+
+            # Make a list of all scripts that have or might resolve.
+            available = have_run + to_run + running
 
             # If the deps for this script will never be met, remove it from the list and continue
             # to the next.
-            if not all(d in all_scripts for d in script.deps):
-                print script.basename, script.deps, all_scripts
-                scripts.remove(script)
+            available_names = [s.basename for s in available]
+            if not all(d in available_names for d in script.deps):
+                to_run.remove(script)
                 continue
 
             # If we haven't met the deps for this script yet, continue to the next one.
-            if not all(d in completed_scriptnames for d in script.deps):
+            completed_names = [s.basename for s in have_run]
+            if not all(d in completed_names for d in script.deps):
                 continue
 
             # All deps met, let's run this script. No matter what happens next, we don't want this
             # in our to-exectute script list anymore.
-            scripts.remove(script)
+            to_run.remove(script)
 
-            log(script.basename.ljust(padding), "blue", end=False)
+            log(script.basename.ljust(padding), "blue")
 
             # Run the script.
-            stdout, stderr, retcode = script.run(RESULTS)
+            script.run(RESULTS, queue)
+            running.append(script)
 
-            # Indicate script pass/fail.
-            if retcode == 0:
-                log("done", "blue")
-            else:
-                log("X", "red")
+        # Detect circular dependencies.
+        if len(to_run) == last_len and len(running) == 0:
+            log("Circular dependency detected, aborting.", "red", attrs=["bold"])
+            log(' '.join(s.basename for s in scripts), "red")
+            break
+        last_len = len(to_run)
+
+        # Handle any available results.
+        while not queue.empty():
+            result = queue.get()
+            script = result["script"]
+            stdout = result["stdout"]
+            stderr = result["stderr"]
+            retcode = result["retcode"]
+
+            running.remove(script)
+
+            # # Indicate script pass/fail.
+            # if retcode == 0:
+            #     log("done", "blue")
+            # else:
+            #     log("X", "red")
 
             if script.info:
                 if len(stdout) > 0:
@@ -114,7 +136,7 @@ def main():
                 script.store_result(stdout, stderr, RESULTS)
 
             if retcode == 0:
-                completed_scriptnames.append(script.basename)
+                have_run.append(script)
 
     if not args.no_save:
         log("Compressing results: %s" % RESULTS + ".tar.gz", "blue", attrs=["bold"])
@@ -124,6 +146,7 @@ def main():
         log("Cleaning up...", "blue", attrs=["bold"])
         shutil.rmtree(RESULTS)
 
+    print "Done.\n"
 
 if __name__ == "__main__":
     main()

@@ -1,2 +1,4 @@
 Circular dependency detected, aborting.
 a.sh b.sh c.sh
+Done.
+

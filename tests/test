@@ -56,14 +56,14 @@ def main():
             print "Skipping %s." % os.path.basename(case)
             continue
 
-        print os.path.basename(case).ljust(padding),
+        print os.path.basename(case).ljust(padding)
 
         env = os.environ.copy()
         env["ZI_SCRIPTS"] = os.path.join(case, "scripts")
         env["ZI_RESULTS"] = TEMPOUT
         with open(os.path.join(case, "command"), 'r') as f:
             command = ''.join(f.readlines()).strip().split()
-        command = ["./inspect", "--no-save", "--no-remove"] + command
+        command = ["./inspect", "--no-save", "--no-remove", "-j1"] + command
 
         p = sp.Popen(command, env=env, stderr=sp.PIPE, stdout=sp.PIPE)
         stdout, stderr = p.communicate()

@@ -1,5 +1,6 @@
 
 import os
+from threading import Thread
 from subprocess import Popen, PIPE, CalledProcessError, check_call
 
 ZI_TAGS = "zenoss-inspector-tags"
@@ -40,10 +41,20 @@ class Script(object):
             return True
         return False
 
-    def run(self, cwd):
+    def __run(self, cwd, queue):
         p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=cwd)
         stdout, stderr = p.communicate()
-        return stdout, stderr, p.returncode
+        queue.put({
+            "script": self,
+            "stdout": stdout,
+            "stderr": stderr,
+            "retcode": p.returncode
+        })
+
+    def run(self, cwd, queue):
+        t = Thread(target=self.__run, args=(cwd, queue))
+        t.setDaemon(True)
+        t.start()
 
     def store_result(self, stdout, stderr, result_path):
         fout = os.path.join(result_path, self.basename + ".stdout")
