@@ -135,6 +135,7 @@ def main():
                 stdout = result["stdout"]
                 stderr = result["stderr"]
                 if len(stdout) > 0:
+                    log(script.basename, "red", attrs=["bold"])
                     log(stdout.strip(), "red")
                 if len(stderr) > 0:
                     log("Error running %s" % script.basename, "red", attrs=["bold"])
