@@ -56,7 +56,7 @@ def main():
             print "Skipping %s." % os.path.basename(case)
             continue
 
-        print os.path.basename(case).ljust(padding)
+        print os.path.basename(case).ljust(padding),
 
         env = os.environ.copy()
         env["ZI_SCRIPTS"] = os.path.join(case, "scripts")

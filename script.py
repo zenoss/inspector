@@ -1,7 +1,7 @@
 
 import os
 from threading import Thread
-from subprocess import Popen, PIPE, CalledProcessError, check_call
+from subprocess import Popen, PIPE
 
 ZI_TAGS = "zenoss-inspector-tags"
 ZI_DEPS = "zenoss-inspector-deps"
@@ -42,25 +42,26 @@ class Script(object):
         return False
 
     def __run(self, cwd, queue):
-        p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=cwd)
-        stdout, stderr = p.communicate()
-        queue.put({
-            "script": self,
-            "stdout": stdout,
-            "stderr": stderr,
-            "retcode": p.returncode
-        })
+        if self.info:
+            p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=cwd)
+            stdout, stderr = p.communicate()
+            queue.put({
+                "script": self,
+                "stdout": stdout,
+                "stderr": stderr,
+                "retcode": p.returncode
+            })
+        else:
+            fout = open(os.path.join(cwd, self.basename + ".stdout"), 'w')
+            ferr = open(os.path.join(cwd, self.basename + ".stderr"), 'w')
+            p = Popen(self.script, stdout=fout, stderr=ferr, cwd=cwd)
+            p.communicate()
+            queue.put({
+                "script": self,
+                "retcode": p.returncode
+            })
 
     def run(self, cwd, queue):
         t = Thread(target=self.__run, args=(cwd, queue))
         t.setDaemon(True)
         t.start()
-
-    def store_result(self, stdout, stderr, result_path):
-        fout = os.path.join(result_path, self.basename + ".stdout")
-        with open(fout, 'w') as f:
-            f.write(stdout)
-        if len(stderr) > 0:
-            ferr = os.path.join(result_path, self.basename + ".stderr")
-            with open(ferr, 'w') as f:
-                f.write(stderr)
