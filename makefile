@@ -2,7 +2,7 @@
 
 clean:
 	@rm -rf inspected-*
-	@find . | grep .pyc | xargs rm
+	@find . | grep .pyc | xargs --no-run-if-empty rm
 
 lint:
 	@pylint -d too-many-branches -d line-too-long -d invalid-name -d missing-docstring -d too-many-locals -d too-many-statements -r n inspect script
