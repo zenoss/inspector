@@ -4,9 +4,6 @@
 # zenoss-inspector-tags docker
 # zenoss-inspector-deps docker-info.sh
 
-#set -e
-#set -x
-
 # First make sure docker is using devicemapper
 # Note that if we skip all checks don't have docker-info.sh.stdout
 # (e.g. docker wasn't running)
