@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-deps serviced-confg.sh
+# zenoss-inspector-deps serviced-config.sh
 
 def main():
     with open("serviced-config.sh.stdout", 'r') as f:
