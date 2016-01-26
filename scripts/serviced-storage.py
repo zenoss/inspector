@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-deps serviced-confg.sh
+# zenoss-inspector-deps etc-default-serviced.sh
 
 def main():
-    with open("serviced-config.sh.stdout", 'r') as f:
+    with open("etc-default-serviced.sh.stdout", 'r') as f:
         lines = f.readlines()
 
     isMaster = False

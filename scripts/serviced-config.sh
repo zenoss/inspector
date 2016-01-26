@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cat /etc/default/serviced
+# zenoss-inspector-tags serviced
+
+serviced config
