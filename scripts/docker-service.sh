@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cat /usr/systemd/system/docker.service
+cat /usr/lib/systemd/system/docker.service
