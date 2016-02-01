@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# zenoss-inspector-tags slow
+# zenoss-inspector-tags slow docker
 
 import subprocess as sp
 import json

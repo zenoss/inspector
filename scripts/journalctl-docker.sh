@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags serviced
+# zenoss-inspector-tags docker serviced
 
 journalctl -u docker
 
