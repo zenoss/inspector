@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cat /usr/systemd/system/docker.service
+# zenoss-inspector-tags docker
+
+cat /usr/lib/systemd/system/docker.service

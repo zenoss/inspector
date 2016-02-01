@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# zenoss-inspector-tags docker
+
 echo "============================="
 echo "output from 'docker version':"
 echo "============================="
