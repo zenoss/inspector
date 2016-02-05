@@ -20,8 +20,3 @@ if vsplit[0] < 7:
 
 if vsplit[1] < 1:
     bail()
-
-
-
-
-
