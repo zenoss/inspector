@@ -12,8 +12,11 @@ def main():
     stdout, stderr = p.communicate()
     if p.returncode != 0:
         raise sp.CalledProcessError(p.returncode, ' '.join(cmd))
-    bip = "--bip=" + stdout.split('\n')[2].strip().split()[1]
-    dns = "--dns=" + stdout.split('\n')[2].strip().split()[1].split('/')[0]
+    ipV4InfoLine =  stdout.split('\n')[2].strip()
+    ipv4AddrWithNetmask = ipV4InfoLine.split()[1]
+    ipv4AddrWithoutNetmask = ipv4AddrWithNetmask.split('/')[0]
+    bip = "--bip=" + ipv4AddrWithNetmask
+    dns = "--dns=" + ipv4AddrWithoutNetmask
     with open('docker-config.sh.stdout', 'r') as f:
         data = f.read()
     if not dns in data:
