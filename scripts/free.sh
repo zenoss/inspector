@@ -1,3 +1,3 @@
 #!/bin/bash
 
-free  -h -l -t -V
+free  -h -l -t
