@@ -46,7 +46,7 @@ def get_args():
                         help="Don't compress results.")
     parser.add_argument("-j", "--jobs", default=16, type=int, help="Maximum number of jobs to run in parallel.")
     parser.add_argument("-t", "--timeout", default=0, type=int, help="Timeout in seconds for entire inspection.")
-    parser.add_argument("-l", "--lines", default=0, type=int, help="Limit output of each result file to LINES lines. Default (0) is disabled.")
+    parser.add_argument("-l", "--lines", default=100000, type=int, help="Limit output of each result file to LINES lines. Set to 0 to collect all lines. Default is 100000.")
     tags = parser.add_mutually_exclusive_group()
     tags.add_argument("-w", "--whitelist", nargs="+", help="Use only these tags.")
     tags.add_argument("-b", "--blacklist", nargs="+", help="Don't use these tags.")
