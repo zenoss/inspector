@@ -130,6 +130,22 @@ should only be used to indicate a possible issue, not for general output.
 
 echo "There's a problem!"
 ```
+### zenoss-inspector-files
+Add a comment to your script with ```zenoss-inspector-files``` if your script produces files to be
+included in the inspector output.  When this directive is set, inspector will create a directory for
+your script's output files and pass the absolute path to this directory as the first argument.
+
+NOTE: THIS DIRECTIVE IS IGNORED IF ```zenoss-inspector-info``` IS SET
+
+##### Example
+```bash
+#!/bin/bash
+
+# zenoss-inspector-files
+
+cd $1
+echo "This needs to be in a special file!" > specialFile.out
+```
 
 ### A complete example: warn the user if Docker isn't running.
 

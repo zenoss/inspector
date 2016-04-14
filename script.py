@@ -6,6 +6,7 @@ from subprocess import Popen, PIPE
 ZI_TAGS = "zenoss-inspector-tags"
 ZI_DEPS = "zenoss-inspector-deps"
 ZI_INFO = "zenoss-inspector-info"
+ZI_FILE = "zenoss-inspector-files" # script writes output files directly to the target dir
 
 class Script(object):
 
@@ -17,6 +18,7 @@ class Script(object):
         self.deps = []
         self.load_dependencies()
         self.info = self.get_info_tag()
+        self.files = self.get_files_tag()
 
     def load_tags(self):
         with open(self.script, 'r') as f:
@@ -41,6 +43,13 @@ class Script(object):
             return True
         return False
 
+    def get_files_tag(self):
+        with open(self.script, 'r') as f:
+            raw = ''.join(f.readlines())
+        if ZI_FILE in raw:
+            return True
+        return False
+
     def __run(self, cwd, queue):
         if self.info:
             p = Popen(self.script, stdout=PIPE, stderr=PIPE, cwd=cwd)
@@ -52,9 +61,16 @@ class Script(object):
                 "retcode": p.returncode
             })
         else:
+            if self.files:
+                outDir = os.path.join(cwd, os.path.splitext(self.basename)[0])
+                os.mkdir(outDir)
+                cmd = [self.script, os.path.abspath(outDir)]
+            else:
+                cmd = self.script
+
             fout = open(os.path.join(cwd, self.basename + ".stdout"), 'w')
             ferr = open(os.path.join(cwd, self.basename + ".stderr"), 'w')
-            p = Popen(self.script, stdout=fout, stderr=ferr, cwd=cwd)
+            p = Popen(cmd, stdout=fout, stderr=ferr, cwd=cwd)
             p.communicate()
             queue.put({
                 "script": self,
