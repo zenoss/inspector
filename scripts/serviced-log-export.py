@@ -4,7 +4,6 @@
 # zenoss-inspector-files
 
 from subprocess import call
-import json
 import argparse
 import os
 
