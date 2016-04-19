@@ -1,5 +1,6 @@
 #!/bin/bash
 # zenoss-inspector-tags slow big servicelogs
+# zenoss-inspector-deps serviced-service-list.sh
 
 cleanup ()
 {
@@ -17,7 +18,7 @@ mkdir $SLE_OUT
 
 # Export logs for each top-level service. If we don't specify a top-level service, we will get serviced
 #  and other logs that are already pulled by other scripts
-serviced service list -a | awk '/^.-/{print $2}' | while read -r svcid ; do
+awk '/^  [^ ]/{print $2}' serviced-service-list.sh.stdout | while read -r svcid ; do
     tarfile=$SLE_TEMP/$svcid.tgz
     outfolder=$SLE_OUT/$svcid
 
