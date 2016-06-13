@@ -21,16 +21,20 @@ def main():
 
     # Get the tsdb table names for all tenants
     for line in stdout.strip().split("\n"):
+        # Only check tsdb tables
         if line.endswith("-tsdb"):
+            # Describe the table
             cmd = ["serviced", "service", "shell", "writer",
                    "bash", "-c",
                    "echo 'describe \"{}\"'|/opt/hbase/bin/hbase shell".format(
                        line)]
             stdout, stderr = run(cmd)
+
+            # Check the TTL
             if ("TTL => 'FOREVER'" in stdout or
                     "TTL => '2147483647'" in stdout):
-                print "Tenant {} has opentsdb TTL set to FOREVER".format(
-                    line)
+                print "CHECK FAILED: Tenant {} has opentsdb TTL set " \
+                    "to FOREVER".format(line)
                 print "Set to 90 days with:"
                 print "    serviced service shell writer " \
                     "/opt/opentsdb/set-opentsdb-table-ttl.sh 7776000"
