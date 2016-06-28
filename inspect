@@ -13,6 +13,7 @@ from subprocess import check_call
 from termcolor import colored
 from script import Script
 
+VERSION = "$Format:%H$"
 PATH = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.environ.get("ZI_SCRIPTS") or os.path.join(PATH, "scripts")
 RESULTS = os.environ.get("ZI_RESULTS") or "inspected-%s" % datetime.today().isoformat().replace(":", "-")
@@ -40,6 +41,7 @@ def get_scripts():
 
 def get_args():
     parser = argparse.ArgumentParser(description="Inspect a Zenoss installation.")
+    parser.add_argument("-v", "--version", action="store_true", default=False, help="Print version and exit.")
     parser.add_argument("--no-remove", action="store_true", default=False,
                         help="Don't remove working directory.")
     parser.add_argument("--no-save", action="store_true", default=False,
@@ -55,6 +57,10 @@ def get_args():
 def main():
     args = get_args()
     scripts = get_scripts()
+
+    if args.version:
+        print VERSION
+        return
 
     if args.whitelist:
         scripts = [s for s in scripts if any(t in args.whitelist for t in s.tags)]
