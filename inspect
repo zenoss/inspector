@@ -13,6 +13,14 @@ from subprocess import check_call
 from termcolor import colored
 from script import Script
 
+#
+# For now, we are using the git SHA as the version number for inspector, with the plan
+# that eventually this evolve to a regular n.n.n version number once we have inspector
+# on a formal release train.
+#
+# Note that the Format variable will be replaced with the git SHA whenever a ZIP is created
+# with the git-archive command.
+#
 VERSION = "$Format:%H$"
 PATH = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.environ.get("ZI_SCRIPTS") or os.path.join(PATH, "scripts")
@@ -70,6 +78,8 @@ def main():
     padding = max([len(s.basename) for s in scripts]) + 4
 
     os.mkdir(RESULTS)
+
+    log("Starting inspector version %s" % VERSION, "blue", attrs=["bold"])
 
     to_run = scripts
     have_run = []
