@@ -1,5 +1,9 @@
 # Zenoss Inspector
 
+## Limitations
+* Currently only works on Centos/RHEL
+* Some steps may fail for Zenoss Core
+
 ## Inspecting a host
 
 ### Quick & dirty inspection
