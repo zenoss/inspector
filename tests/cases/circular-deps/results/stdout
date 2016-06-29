@@ -1,4 +1,6 @@
+Starting inspector version $Format:%H$
 Circular dependency detected, aborting.
 a.sh b.sh
+Limiting result logs to 100000 lines.
 Done.
 
