@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# Commit: $Format:%H$
+# Date:   $Format:%cD$
 
 import os
 import sys
