@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# zenoss-inspector-tags process
+# zenoss-inspector-tags process docker
 
 ps aux
