@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cat /etc/systemd/journald.conf 
+# zenoss-inspector-tags os
+
+cat /etc/systemd/journald.conf

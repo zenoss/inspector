@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# zenoss-inspector-tags slow
+# zenoss-inspector-tags slow os
 
 lsof

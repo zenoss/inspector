@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
+# zenoss-inspector-tags os
 # zenoss-inspector-deps dfinode.sh
 
 CUTOFF = 90
