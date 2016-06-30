@@ -164,7 +164,7 @@ def main():
             # to the next.
             available_names = [s.basename for s in available]
             if not all(d in available_names for d in script.deps):
-                log("Skipping script %s because one or more its dependencies are not available" % s.basename)
+                log("Skipping script %s because one or more its dependencies are not available" % script.basename)
                 to_run.remove(script)
                 continue
 
