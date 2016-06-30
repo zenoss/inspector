@@ -1,4 +1,4 @@
-usage: inspect [-h] [-v] [--no-remove] [--no-save] [-j JOBS] [-t TIMEOUT]
-               [-l LINES] [-w WHITELIST [WHITELIST ...] | -b BLACKLIST
-               [BLACKLIST ...]]
+usage: inspect [-h] [-v] [--print-tags] [--no-remove] [--no-save] [-j JOBS]
+               [-t TIMEOUT] [-l LINES] [-w WHITELIST [WHITELIST ...] | -b
+               BLACKLIST [BLACKLIST ...]]
 inspect: error: argument -b/--blacklist: not allowed with argument -w/--whitelist

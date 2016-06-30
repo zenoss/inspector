@@ -1,3 +1,4 @@
 Starting inspector version $Format:%H$
+Skipping script a.sh because one or more its dependencies are not available
 c.sh    done
 Limiting result logs to 100000 lines.
