@@ -1,5 +1,7 @@
+Starting inspector version $Format:%H$
 c.sh    done
 b.sh    done
 a.sh    done
+Limiting result logs to 100000 lines.
 Done.
 
