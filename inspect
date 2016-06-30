@@ -137,7 +137,10 @@ def main():
         # Detect circular dependencies.
         if len(to_run) == last_len and len(running) == 0:
             log("Circular dependency detected, aborting.", "red", attrs=["bold"])
-            log(' '.join(s.basename for s in scripts), "red")
+            # Sort the names for test predictability
+            names = [s.basename for s in scripts]
+            names.sort()
+            log(' '.join(names), "red")
             break
         last_len = len(to_run)
 
