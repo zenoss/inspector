@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
+# zenoss-inspector-tags os
 # zenoss-inspector-deps uname-a.sh
+
 import re
 import platform
 

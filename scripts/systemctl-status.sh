@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags docker serviced
+# zenoss-inspector-tags docker serviced serviced-worker
 
 systemctl show --property=Names,Description,LoadState,ActiveState,UnitFileState dnsmasq
 systemctl show --property=Names,Description,LoadState,ActiveState,UnitFileState docker

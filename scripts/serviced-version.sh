@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags serviced
+# zenoss-inspector-tags serviced serviced-worker
 
 serviced version
 

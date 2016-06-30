@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # zenoss-inspector-info
-# zenoss-inspector-tags selinux
+# zenoss-inspector-tags selinux os
 # zenoss-inspector-deps selinux-config.sh
 
 SELINUX_CONFIG=`grep "^SELINUX=" selinux-config.sh.stdout 2>/dev/null`
