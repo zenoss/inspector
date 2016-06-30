@@ -11,9 +11,8 @@ def main():
         with open("uname-a.sh.stdout", 'r') as f:
             line = f.read()
             kver = tuple(map(int, re.search(r'^[^ ]+ [^ ]+ (\d+)\.(\d+)\.(\d+)-(\d+)', line).groups())) 
-            if kver < (3,10,0,327):
-                if kver > (3,10,0,229):
-                    print 'Kernel version does not support fstrim, update to version 3.10.0-327 or higher'
+            if (3,10,0,229) < kver < (3,10,0,327):        
+                print 'Kernel versions between 3.10.0-229 and 3.10.0-327 do not support fstrim which is used to free unused storage blocks over time. Update to version 3.10.0-327 or higher to avoid running out of usable storage'
 
 if __name__ == "__main__":
     main()
