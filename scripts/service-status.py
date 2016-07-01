@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-deps systemctl-status.sh
-# zenoss-inspector-tags docker serviced serviced-worker verify
+# zenoss-inspector-deps systemctl-status.sh get-ha-versions.sh
+# zenoss-inspector-tags docker serviced serviced-worker verify ha
 
 
 class SystemService(object):
@@ -26,12 +26,26 @@ class SystemService(object):
         if self.active:
             print "System service '%s': %s' is running" % (self.name, self.description)
 
+# Returns True if the current system is configured for HA
+def checkForHA():
+    isHA = False
+    with open("get-ha-versions.sh.stdout", 'r') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        line = line.strip()
+        if line == "HAS_PCS=true":
+            isHA = True
+            break
+
+    return isHA
 #
 # Parse the contents of systemctl-status.sh.stdout into a list of SystemService objects,
 # and verify the status of the services that Control Center does or does not expect to
 # be started and running.
 #
 def main():
+    isHA = checkForHA()
     with open("systemctl-status.sh.stdout", 'r') as f:
         lines = f.readlines()
 
@@ -53,22 +67,38 @@ def main():
             service.enabled = nameValuePair[1] == "enabled" or nameValuePair[1] == "static"
 
     # Verify the service states CC expects
-    dnsmasqInstalled = dockerInstalled = ntpInstalled = servicedInstalled = False
+    dnsmasqInstalled = dockerInstalled = ntpInstalled = servicedInstalled = corosyncInstalled = pacemakerInstalled = False
     for service in services:
         if service.name.startswith("dnsmasq"):
             dnsmasqInstalled = True
-            service.validateEnabledAndActive()
-        elif service.name.startswith("docker"):
-            dockerInstalled = True
             service.validateEnabledAndActive()
         elif service.name.startswith("firewalld"):
             service.validateDisabledAndStopped()
         elif service.name.startswith("ntp"):
             ntpInstalled = True
             service.validateEnabledAndActive()
+        elif not isHA:
+            if service.name.startswith("docker"):
+                dockerInstalled = True
+                service.validateEnabledAndActive()
+            elif service.name.startswith("serviced"):
+                servicedInstalled = True
+                service.validateEnabledAndActive()
+        #
+        # Every check below assumes we're in an HA environment.
+        elif service.name.startswith("corosync"):
+            corosyncInstalled = True
+            service.validateEnabledAndActive()
+        elif service.name.startswith("pacemaker"):
+            pacemakerInstalled = True
+            service.validateEnabledAndActive()
+        elif service.name.startswith("docker"):
+            dockerInstalled = True
+            service.validateDisabledAndStopped()
         elif service.name.startswith("serviced"):
             servicedInstalled = True
-            service.validateEnabledAndActive()
+            service.validateDisabledAndStopped()
+
 
     if not dnsmasqInstalled:
         print "The dnsmasq service is not installed"
@@ -79,8 +109,12 @@ def main():
     if not ntpInstalled:
         print "The ntp service is not installed"
 
-    if not servicedInstalled:
-        print "The Control Center service is not installed"
+    if isHA:
+        if not corosyncInstalled:
+            print "The corosync service is not installed"
+
+        if not pacemakerInstalled:
+            print "The pacemaker service is not installed"
 
 if __name__ == "__main__":
     main()
