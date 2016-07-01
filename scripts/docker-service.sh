@@ -2,4 +2,4 @@
 
 # zenoss-inspector-tags docker
 
-cat /usr/lib/systemd/system/docker.service
+cat /etc/systemd/system/docker.service.d/docker.conf || cat /usr/lib/systemd/system/docker.service
