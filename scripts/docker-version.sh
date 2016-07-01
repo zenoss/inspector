@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# zenoss-inspector-tags docker
+# zenoss-inspector-tags rpm docker
+# zenoss-inspector-deps get-rpms.sh
 
 echo "============================="
 echo "output from 'docker version':"
@@ -10,4 +11,4 @@ docker version
 echo "============================="
 echo "RPM information for docker"
 echo "============================="
-rpm -qa | grep docker
+grep docker get-rpms.sh.stdout
