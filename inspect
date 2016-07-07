@@ -77,7 +77,7 @@ def get_tags(scripts):
     tags.sort()
     return tags
 
-# Log an error if any tag in tagList is found in allTags
+# Log an error if any tag in tagList is NOT found in allTags
 def invalid_tags_found(description, tagList, allTags):
     if not tagList:
         return False
