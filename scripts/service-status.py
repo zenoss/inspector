@@ -2,7 +2,7 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-deps systemctl-status.sh
-# zenoss-inspector-tags docker serviced serviced-worker
+# zenoss-inspector-tags docker serviced serviced-worker verify
 
 
 class SystemService(object):

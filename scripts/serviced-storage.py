@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# zenoss-inspector-info
+# zenoss-inspector-info verify
 # zenoss-inspector-deps serviced-config.sh serviced-storage.sh
 import os
 from stat import *

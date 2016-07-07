@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-tags network
+# zenoss-inspector-tags network verify
 # zenoss-inspector-deps etchosts.sh
 
 def main():

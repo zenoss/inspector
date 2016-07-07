@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # zenoss-inspector-info
-# zenoss-inspector-tags docker
+# zenoss-inspector-tags docker verify
 # zenoss-inspector-deps docker-info.sh
 
 # First make sure docker is using devicemapper

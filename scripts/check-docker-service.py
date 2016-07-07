@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-tags docker
+# zenoss-inspector-tags docker verify
 # zenoss-inspector-deps docker-service.sh
 
 import ConfigParser
