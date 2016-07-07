@@ -1,4 +1,5 @@
 Starting inspector version $Format:%H$
+Using whitelist of tags: [a]
 a.sh    done
 b.sh    done
 Limiting result logs to 100000 lines.

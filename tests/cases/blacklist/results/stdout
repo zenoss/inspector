@@ -1,4 +1,5 @@
 Starting inspector version $Format:%H$
+Using blacklist of tags: [a]
 c.sh    done
 Limiting result logs to 100000 lines.
 Done.

@@ -53,6 +53,7 @@ def get_scripts():
 def get_args():
     parser = argparse.ArgumentParser(description="Inspect a Zenoss installation.")
     parser.add_argument("-v", "--version", action="store_true", default=False, help="Print version and exit.")
+    parser.add_argument("--print-tags", action="store_true", default=False, help="Print tags and exit.")
     parser.add_argument("--no-remove", action="store_true", default=False,
                         help="Don't remove working directory.")
     parser.add_argument("--no-save", action="store_true", default=False,
@@ -65,12 +66,52 @@ def get_args():
     tags.add_argument("-b", "--blacklist", nargs="+", help="Don't use these tags.")
     return parser.parse_args()
 
+# Get a unique, sorted list of tags from all scripts
+def get_tags(scripts):
+    allTags = []
+    for s in scripts:
+        if s.tags:
+            allTags.extend(s.tags)
+    uniqueTags = set(allTags)
+    tags = list(uniqueTags)
+    tags.sort()
+    return tags
+
+# Log an error if any tag in tagList is NOT found in allTags
+def invalid_tags_found(description, tagList, allTags):
+    if not tagList:
+        return False
+    err = False
+    for tag in tagList:
+        if tag in allTags:
+            continue
+        err = True
+        log("ERROR: %s tag %s is not defined" % (description, tag))
+
+    return err
+
 def main():
     args = get_args()
-    scripts = get_scripts()
-
     if args.version:
         print VERSION
+        return
+
+    # Create the results directory so we can write log messages from this point on
+    os.mkdir(RESULTS)
+
+    scripts = get_scripts()
+    if len(scripts) == 0:
+        log("ERROR: no scripts found in %s" % SCRIPTS)
+        return
+
+    allTags = get_tags(scripts)
+    if args.print_tags:
+        log("Found these tags = [%s]" % ', '.join(allTags))
+        return
+
+    # Bail if someone specified invalid tags; otherwise they may incorrectly
+    #    assume that something happened for the wrong reason
+    if invalid_tags_found("whitelist", args.whitelist, allTags) or invalid_tags_found("blacklist", args.blacklist, allTags):
         return
 
     if args.whitelist:
@@ -78,11 +119,16 @@ def main():
     elif args.blacklist:
         scripts = [s for s in scripts if not any(t in args.blacklist for t in s.tags)]
 
-    padding = max([len(s.basename) for s in scripts]) + 4
-
-    os.mkdir(RESULTS)
+    if len(scripts) == 0:
+        if args.blacklist:
+            log("ERROR: no scripts to run after applying the blacklist [%s]" % ', '.join(args.blacklist))
+        return
 
     log("Starting inspector version %s" % VERSION, "blue", attrs=["bold"])
+    if args.whitelist:
+        log("Using whitelist of tags: [%s]" % ', '.join(args.whitelist))
+    elif args.blacklist:
+        log("Using blacklist of tags: [%s]" % ', '.join(args.blacklist))
 
     to_run = scripts
     have_run = []
@@ -93,7 +139,7 @@ def main():
     start_time = time.time()
 
     queue = Queue.Queue()
-
+    padding = max([len(s.basename) for s in scripts]) + 4
     while len(to_run) + len(running) > 0:
 
         if args.timeout > 0 and time.time() - start_time >= args.timeout:
@@ -118,6 +164,7 @@ def main():
             # to the next.
             available_names = [s.basename for s in available]
             if not all(d in available_names for d in script.deps):
+                log("Skipping script %s because one or more its dependencies are not available" % script.basename)
                 to_run.remove(script)
                 continue
 
