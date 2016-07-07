@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-tags os
+# zenoss-inspector-tags os verify
 # zenoss-inspector-deps df.sh
 
 CUTOFF = 90

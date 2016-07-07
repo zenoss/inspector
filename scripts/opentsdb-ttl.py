@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-tags rm opentsdb ZEN-22981
+# zenoss-inspector-tags rm opentsdb verify ZEN-22981
 
 import subprocess as sp
 
