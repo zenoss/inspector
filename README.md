@@ -56,11 +56,16 @@ Inspect a Zenoss installation.
 
 optional arguments:
   -h, --help            show this help message and exit
+  -v, --version         Print version and exit.
+  --print-tags          Print tags and exit.
   --no-remove           Don't remove working directory.
   --no-save             Don't compress results.
   -j JOBS, --jobs JOBS  Maximum number of jobs to run in parallel.
   -t TIMEOUT, --timeout TIMEOUT
                         Timeout in seconds for entire inspection.
+  -l LINES, --lines LINES
+                        Limit output of each result file to LINES lines. Set
+                        to 0 to collect all lines. Default is 100000.
   -w WHITELIST [WHITELIST ...], --whitelist WHITELIST [WHITELIST ...]
                         Use only these tags.
   -b BLACKLIST [BLACKLIST ...], --blacklist BLACKLIST [BLACKLIST ...]
