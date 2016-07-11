@@ -6,26 +6,43 @@
 
 import ConfigParser
 
-def bail():
-    print "It doesn't appear /etc/sysconfig/docker has been referenced in your docker.service file."
-    import sys; sys.exit()
+service_file = "/lib/systemd/system/docker.service"
 
-def bail2():
-    print 'Docker configuration should specify "TimeoutSec=300" please adjust in "/etc/systemd/system/docker.service.d/docker.conf", prior to CC 1.1.3 this should be set in /usr/lib/systemd/system/docker.service'
-    import sys; sys.exit()
 
 def main():
     config = ConfigParser.RawConfigParser()
     config.read('docker-service.sh.stdout')
-    if not config.has_option('Service', 'EnvironmentFile'):
-        bail()
-    if config.get('Service', 'EnvironmentFile') != '-/etc/sysconfig/docker':
-        bail()
-    if not config.has_option('Service', 'TimeoutSec'):
-        bail2()
-    if config.get('Service', 'TimeoutSec') != '300':
-        bail2()
 
+    # EnvironmentFile
+    if not config.has_option('Service', 'EnvironmentFile') or \
+            config.get('Service',
+                       'EnvironmentFile') != '-/etc/sysconfig/docker':
+        print "'EnvironmentFile' directive missing or invalid, add " \
+            "'EnvironmentFile=-/etc/sysconfig/docker' to the " \
+            "'Service' section in {}".format(service_file)
+
+    # TimeoutSec
+    if not config.has_option('Service', 'TimeoutSec') or \
+            config.get('Service', 'TimeoutSec') != '300':
+        print "'TimeoutSec' directive missing or invalid, add " \
+            "'TimeoutSec=300' to the 'Service' section in " \
+            "{}".format(service_file)
+
+    # ExecStart
+    if not config.has_option('Service', 'ExecStart') or \
+            config.get('Service', 'ExecStart') != \
+            '/usr/bin/docker daemon $OPTIONS -H fd://':
+        print "'ExecStart' directive missing or invalid, add " \
+            "'ExecStart=/usr/bin/docker daemon $OPTIONS -H fd://' " \
+            "to the 'Service' section in " \
+            "{}".format(service_file)
+
+    # TasksMax
+    if not config.has_option('Service', 'TasksMax') or \
+            config.get('Service', 'TasksMax') != 'infinity':
+        print "'TasksMax' directive missing or invalid, add " \
+            "'TasksMax=infinity' to the 'Service' section in " \
+            "{}".format(service_file)
 
 if __name__ == "__main__":
     main()
