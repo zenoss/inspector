@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags rpm ha
+# zenoss-inspector-tags rpm ha verify
 # zenoss-inspector-deps get-rpms.sh
 
 HAS_DRBD=false

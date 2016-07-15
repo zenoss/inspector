@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags ha
+# zenoss-inspector-tags ha verify
 # zenoss-inspector-deps get-ha-versions.sh get-ha-config.sh etc-default-serviced-filtered.sh
 
 function verify_vip() {
