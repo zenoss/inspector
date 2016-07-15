@@ -11,5 +11,9 @@ fi
 
 pcs constraint
 pcs property
+
+echo "Resource Defaults:"
 pcs resource defaults
+
+echo "Resource Definitions:"
 pcs resource show --full
