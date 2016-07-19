@@ -11,7 +11,8 @@ def main():
         if "Startup" and "/opt/zenoss/ZenPacks" in line:
             print 'There is a problem with the Startup line for the following:'
             print line
-            print 'To correct this edit the service definition with "serviced service edit SERVICE_NAME"'
-            print 'and edit the Startup line to use the symbolic link at "/opt/zenoss/bin"'
+            print 'To correct this you should edit the service definition with "serviced service edit SERVICE_NAME"', \
+                  'and edit the Startup line to use the symbolic link at "/opt/zenoss/bin"'
+
 if __name__ == "__main__":
     main()
