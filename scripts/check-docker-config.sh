@@ -4,7 +4,7 @@
 # zenoss-inspector-tags docker config verify
 # zenoss-inspector-deps docker-config.sh
 
-grep -E -i '--exec-opt native.cgroupdriver=cgroupfs' docker-config.sh.stdout &>/dev/null
+grep -i -- '--exec-opt native.cgroupdriver=cgroupfs' docker-config.sh.stdout &>/dev/null
 
 if [ $? -ne 0 ]
     then
