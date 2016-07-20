@@ -26,6 +26,12 @@ function verify_vip() {
 	return $result
 }
 
+grep "HAS_PCS=true" get-ha-versions.sh.stdout >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	echo "PCS is not installed."
+	exit 0
+fi
+
 RC=0
 
 # Check the Ordering contstraint. The DFSMaster resource should be started first,
