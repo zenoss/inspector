@@ -12,7 +12,7 @@ def main():
         #pprint(data)
         for i in data:
             if "/opt/zenoss/ZenPacks" in i["Startup"]:
-                print "There is an issue with Startup command %s" % i["Name"]
+                print "There is an issue with the Startup command for %s" % i["Name"]
                 print i["Startup"]
                 print 'To correct this you should edit the service definition',\
                       'with "serviced service edit %s" changing the Startup' % i["Name"], \
