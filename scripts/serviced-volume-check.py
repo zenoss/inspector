@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-info
-# zenoss-inspector-tags os verify
+# zenoss-inspector-tags verify
 # zenoss-inspector-deps serviced-storage.sh storage-config.sh
 
 
@@ -10,8 +10,9 @@ def main():
         lines = f.readlines()
     for line in lines:
         if "Application Data" in line:
-            volumeId = line.split()[0]
-            print volumeId
+            volId = line.split()[0]
+            with open("/opt/serviced/var/volumes/.devicemapper/volumes/$volId/metadata.json")
+
 
     with open("storage-config.sh.stdout", 'r') as f:
         lines = f.readlines()
