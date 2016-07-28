@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# zenoss-inspector-tags verify
+#
 # This script captures information about the OS storage configuration on the
 # host machine.
 
