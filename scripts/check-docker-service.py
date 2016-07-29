@@ -37,12 +37,5 @@ def main():
             "to the 'Service' section in " \
             "{}".format(service_file)
 
-    # TasksMax
-    if not config.has_option('Service', 'TasksMax') or \
-            config.get('Service', 'TasksMax') != 'infinity':
-        print "'TasksMax' directive missing or invalid, add " \
-            "'TasksMax=infinity' to the 'Service' section in " \
-            "{}".format(service_file)
-
 if __name__ == "__main__":
     main()
