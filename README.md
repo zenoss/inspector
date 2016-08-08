@@ -4,6 +4,11 @@
 * Currently only works on Centos/RHEL
 * Some steps may fail for Zenoss Core
 
+## Making Contributions
+Pull requests welcome.
+
+Zenoss staff interested in making changes should refer to this [document describing the code change process ](https://docs.google.com/document/d/14TvBCIjC3Hb_WWqMs5naLAlPcpWcE70cUWFAE_5o8hY) for inspector.
+
 ## Inspecting a host
 
 ### Quick & dirty inspection
