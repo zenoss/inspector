@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # zenoss-inspector-tags slow os
+# zenoss-inspector-deps get-rpms.sh
 
-command -v lsof >/dev/null 2>&1
+grep -w lsof get-rpms.sh.stdout
 if [ $? -ne 0 ]; then
-   echo "lsof is not installed." 1>&2
-   exit 1;
+	echo "lsof is not installed."
+	exit 0
 fi
 
 lsof
