@@ -2,8 +2,9 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-tags cpu os
+# zenoss-inspector-deps cpuinfo.sh
 
-cat /proc/cpuinfo | grep -E "flags.*:.*aes"
+cat cpuinfo.sh.stdout | grep -E "flags.*:.*aes" > /dev/null
 
 if [ $? -ne 0 ]; then
     echo "The aes flag is missing from /proc/cpuinfo. Check virtualization compatibility flag."
