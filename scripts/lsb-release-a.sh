@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # zenoss-inspector-tags os
+# zenoss-inspector-deps get-rpms.sh
 
-command -v lsb_release >/dev/null 2>&1
+grep -w lsb get-rpms.sh.stdout
 if [ $? -ne 0 ]; then
-   echo "lsb_release is not installed." 1>&2
-   exit 1;
+	echo "lsb_release is not installed."
+	exit 0;
 fi
 
 lsb_release -a
