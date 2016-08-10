@@ -14,6 +14,6 @@ do
 
     if [ $? -ne 0 ]
         then
-            echo "Your setting for $setting appears to be a hostname. It is recommended to use an IP address for this setting."
+            echo "Your setting for $setting appears to be a hostname. It is recommended to use an IP address for this setting to avoid DNS-related issues."
         fi
 done
