@@ -2,7 +2,9 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-tags rm opentsdb verify ZEN-22981
+# zenoss-inspector-deps serviced-service-status.sh
 
+import re
 import subprocess as sp
 
 
@@ -15,6 +17,12 @@ def run(cmd):
 
 
 def main():
+    with open('serviced-service-status.sh.stdout', 'r') as f:
+        contents = f.read()
+        if not re.findall("writer.*Running", contents):
+            print "writer service is not running, skipping opentsdb TTL check"
+            return
+
     cmd = ["serviced", "service", "shell", "writer",
            "bash", "-c", "echo list|/opt/hbase/bin/hbase shell"]
     stdout, stderr = run(cmd)
