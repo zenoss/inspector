@@ -9,6 +9,12 @@ Pull requests welcome.
 
 Zenoss staff interested in making changes should refer to this [document describing the code change process ](https://docs.google.com/document/d/14TvBCIjC3Hb_WWqMs5naLAlPcpWcE70cUWFAE_5o8hY) for inspector.
 
+### Unit testing
+Use the following to unit-test changes to the inspector framework:
+```
+$ make test
+```
+
 ## Inspecting a host
 
 ### Quick & dirty inspection
