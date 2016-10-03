@@ -25,7 +25,7 @@ def main():
                             pattern2 = re.compile('.*:\d+(-\d+)-(?P<poolId>\w*)\s.*')
                             upool = pattern2.match(line3).group('poolId')
                             if upool != pool:
-                                print "Storage volume mismatch on serviced-serviced--pool: %s see lsblk output, for more information see defect CC-2487" % pool
+                                print "Storage tenant ID mismatch on serviced-serviced--pool: %s see lsblk output, for more information see defect CC-2487" % pool
                                 print "If you have Zenoss Enterprise Support availble it is suggested to open a support case for further assistance. For Zenoss Community users please reference KB article (TBD)."
 if __name__ == "__main__":
     main()
