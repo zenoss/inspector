@@ -26,6 +26,8 @@ def main():
                             upool = pattern2.match(line3).group('poolId')
                             if upool != pool:
                                 print "Storage tenant ID mismatch on serviced-serviced--pool: %s see lsblk output, for more information see defect CC-2487" % pool
-                                print "If you have Zenoss Enterprise Support availble it is suggested to open a support case for further assistance. For Zenoss Community users please reference KB article https://support.zenoss.com/hc/en-us/articles/214841143-Zenoss-Inspector-Reports-Error-Storage-Tenant-ID-Mismatch-"
+                                print "If you have Zenoss Enterprise Support availble it is suggested to open a support case for further assistance."
+                                print "For Zenoss Community users please reference KB article:"
+                                print "https://support.zenoss.com/hc/en-us/articles/214841143-Zenoss-Inspector-Reports-Error-Storage-Tenant-ID-Mismatch-"
 if __name__ == "__main__":
     main()
