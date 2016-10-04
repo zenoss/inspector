@@ -1,8 +1,8 @@
-#!/usr/bin/env python                                                                                                                                       
+#!/usr/bin/env python
 
-# zenoss-inspector-info                                                                                                                                     
-# zenoss-inspector-tags os verify                                                                                                                           
-# zenoss-inspector-deps serviced-storage.sh storage-config.sh                                                                                               
+# zenoss-inspector-info
+# zenoss-inspector-tags os verify
+# zenoss-inspector-deps serviced-storage.sh storage-config.sh
 import re
 
 def main():
