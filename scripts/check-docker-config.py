@@ -20,21 +20,36 @@ def main():
     ipv4AddrWithoutNetmask = ipv4AddrWithNetmask.split('/')[0]
     bip = "--bip=" + ipv4AddrWithNetmask
     dns = "--dns=" + ipv4AddrWithoutNetmask
+
+    cgroupdriver="--exec-opt native.cgroupdriver=cgroupfs"
+    storageopt="--storage-opt dm.thinpooldev=/dev/mapper/docker-docker--pool"
+
     with open('docker-config.sh.stdout', 'r') as f:
         data = f.read()
 
     if not dns in data:
         print "The docker daemon configuration for '--dns' is missing or incorrect"
-        print "The correct value is %s" % dns
+        print "The correct value is '%s'" % dns
         print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
         print "And make sure that there are no additional '--dns' arguments specified in the 'ExecStart=' directive in %s" % service_file
 
     if not bip in data:
         print "The docker daemon configuration for '--bip' is missing or incorrect"
-        print "The correct value is %s" % bip
+        print "The correct value is '%s'" % bip
         print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
         print "And make sure that there are no additional '--bip' arguments specified in the 'ExecStart=' directive in %s" % service_file
 
+    if not cgroupdriver in data:
+        print "The docker daemon configuration for '--exec-opt native.cgroupdriver=' is missing or incorrect"
+        print "The correct value is '%s'" % cgroupdriver
+        print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
+        print "And make sure that there are no additional '--exec-opt' arguments specified in the 'ExecStart=' directive in %s" % service_file
+
+    if not storageopt in data:
+        print "The docker daemon configuration for '--storage-opt dm.thinpooldev=' is missing or incorrect"
+        print "The correct value is '%s'" % storageopt
+        print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
+        print "And make sure that there are no additional '----storage-opt' arguments specified in the 'ExecStart=' directive in %s" % service_file
 
 if __name__ == "__main__":
     main()
