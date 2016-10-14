@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # zenoss-inspector-info
-# zenoss-inspector-tags cpu os
+# zenoss-inspector-tags cpu os verify
 # zenoss-inspector-deps cpuinfo.sh
 
 cat cpuinfo.sh.stdout | grep -E "flags.*:.*aes" > /dev/null
