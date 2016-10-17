@@ -6,7 +6,7 @@
 
 import ConfigParser
 
-service_file = "/lib/systemd/system/docker.service"
+service_file = "/etc/systemd/system/docker.service.d/docker.conf"
 
 
 def main():
@@ -28,14 +28,13 @@ def main():
             "'TimeoutSec=300' to the 'Service' section in " \
             "{}".format(service_file)
 
-    # ExecStart
-    if not config.has_option('Service', 'ExecStart') or \
-            config.get('Service', 'ExecStart') != \
-            '/usr/bin/docker daemon $OPTIONS -H fd://':
-        print "'ExecStart' directive missing or invalid, add " \
-            "'ExecStart=/usr/bin/docker daemon $OPTIONS -H fd://' " \
-            "to the 'Service' section in " \
-            "{}".format(service_file)
+    # The value of
+    if not config.has_option('Service', 'ExecStart'):
+        print "'ExecStart' directive is missing from {}".format(service_file)
+    else:
+        startCmd = config.get('Service', 'ExecStart')
+        if "$OPTIONS" not in startCmd:
+            print "'ExecStart' directive missing $OPTIONS. Update {}".format(service_file)
 
 if __name__ == "__main__":
     main()
