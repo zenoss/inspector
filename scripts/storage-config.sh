@@ -3,7 +3,7 @@
 # zenoss-inspector-tags verify
 #
 # This script captures information about the OS storage configuration on the
-# host machine.
+# host machine. See also pvs.sh, vgs.sh and lvs.sh
 
 echo "============================="
 echo "output from 'lsblk':"
