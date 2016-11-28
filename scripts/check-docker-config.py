@@ -22,7 +22,8 @@ def main():
     dns = "--dns=" + ipv4AddrWithoutNetmask
 
     cgroupdriver="--exec-opt native.cgroupdriver=cgroupfs"
-    storageopt="--storage-opt dm.thinpooldev=/dev/mapper/docker-docker--pool"
+    thinpoolStorageopt="--storage-opt dm.thinpooldev=/dev/mapper/docker-docker--pool"
+    discardStorageopt="--storage-opt dm.mountopt=discard"
 
     with open('docker-config.sh.stdout', 'r') as f:
         data = f.read()
@@ -45,9 +46,15 @@ def main():
         print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
         print "And make sure that there are no additional '--exec-opt' arguments specified in the 'ExecStart=' directive in %s" % service_file
 
-    if not storageopt in data:
+    if not thinpoolStorageopt in data:
         print "The docker daemon configuration for '--storage-opt dm.thinpooldev=' is missing or incorrect"
-        print "The correct value is '%s'" % storageopt
+        print "The correct value is '%s'" % thinpoolStorageopt
+        print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
+        print "And make sure that there are no additional '----storage-opt' arguments specified in the 'ExecStart=' directive in %s" % service_file
+
+    if not discardStorageopt in data:
+        print "The docker daemon configuration for '--storage-opt dm.mountopt=' is missing or incorrect"
+        print "The correct value is '%s'" % discardStorageopt
         print "Please add the correct value to the 'OPTIONS=' directive in %s" % config_file
         print "And make sure that there are no additional '----storage-opt' arguments specified in the 'ExecStart=' directive in %s" % service_file
 
