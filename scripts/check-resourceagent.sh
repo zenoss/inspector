@@ -2,7 +2,12 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-tags rpm docker ha verify os
-# zenoss-inspector-deps get-rpms.sh
+# zenoss-inspector-deps get-ha-versions.sh get-rpms.sh
+
+grep "HAS_PCS=true" get-ha-versions.sh.stdout >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	exit 0
+fi
 
 MIN_VERSION="0.0.9"
 
