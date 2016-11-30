@@ -3,7 +3,10 @@
 # zenoss-inspector-deps nfs-server-service.sh
 # zenoss-inspector-info
 
+
 def main():
+    conf_file="/etc/systemd/system/nfs-server.service.d/nfs-server.conf"
+
     with open('nfs-server-service.sh.stdout', 'r') as f:
         lines = f.readlines()
     foundTarget = False
@@ -14,11 +17,11 @@ def main():
         if 'Requires' in line and 'rpcbind.service' in line:
             foundService = True
     if foundTarget and not foundService:
-        print 'It appears rpcbind.target has been required in your /lib/systemd/system/nfs-server.service file. Instead, require rpcbind.service.'
+        print 'It appears rpcbind.target has been required in your %s file. Instead, require rpcbind.service.' % conf_file
     if foundTarget and foundService:
-        print 'It appears rpcbind.target and rpcbind.service have both been required in your /lib/systemd/system/nfs-server.service file. Require only rpcbind.service.'
+        print 'It appears rpcbind.target and rpcbind.service have both been required in your %s file. Require only rpcbind.service.' % conf_file
     if not foundTarget and not foundService:
-        print 'Require rpcbind.service in your /lib/systemd/system/nfs-server.service file.'
+        print 'Require rpcbind.service in your %s file.' % conf_file
         
     
     
