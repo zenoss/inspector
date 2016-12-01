@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# zenoss-inspector-info
 # zenoss-inspector-tags ha verify
 # zenoss-inspector-deps get-ha-versions.sh get-ha-config.sh etc-default-serviced-filtered.sh
 
@@ -28,7 +29,6 @@ function verify_vip() {
 
 grep "HAS_PCS=true" get-ha-versions.sh.stdout >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo "PCS is not installed."
 	exit 0
 fi
 
