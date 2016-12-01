@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-# zenoss-inspector-deps nfs-server-service.sh serviced-version.sh
+# zenoss-inspector-deps nfs-server-service.sh serviced-major-minor-version.sh
 # zenoss-inspector-info
 
 
 def main():
-    with open('serviced-version.sh.stdout') as vfile:
+    with open('serviced-major-minor-version.sh.stdout') as vfile:
         cc_version = vfile.read().replace('\n', '')
 
     if cc_version == "1.0" or cc_version == "1.1":

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# zenoss-inspector-deps serviced-version.sh
+# zenoss-inspector-deps serviced-major-minor-version.sh
 
 # RM installation doc 1.2 recommends to use nfs-server drop-in conf files
 
-CC_VERSION=$(cat serviced-version.sh.stdout)
+CC_VERSION=$(cat serviced-major-minor-version.sh.stdout)
 
 if [[ $CC_VERSION == "1.0" || $CC_VERSION == "1.1" ]]
 then
