@@ -2,7 +2,7 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-tags config serviced serviced-worker verify
-# zenoss-inspector-deps serviced-config.sh serviced-version.sh
+# zenoss-inspector-deps serviced-config.sh serviced-major-minor-version.sh
 
 # Verify that if this is a master node, that it is also an agent
 
@@ -12,7 +12,7 @@ then
     exit
 fi
 
-CC_VERSION=`grep -w 'Version:' serviced-version.sh.stdout 2>/dev/null | awk '{print $2}' | cut -d\. -f1-2`
+CC_VERSION=$(cat serviced-major-minor-version.sh.stdout)
 if [[ "$CC_VERSION" == "1.0" || "$CC_VERSION" == "1.1" ]]
 then
         grep -E -i "SERVICED_AGENT=(1|true|t|yes)" serviced-config.sh.stdout &>/dev/null

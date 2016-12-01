@@ -1,9 +1,20 @@
 #!/usr/bin/env python
 
-# zenoss-inspector-deps nfs-server-service.sh
+# zenoss-inspector-deps nfs-server-service.sh serviced-major-minor-version.sh
 # zenoss-inspector-info
 
+
 def main():
+    with open('serviced-major-minor-version.sh.stdout') as vfile:
+        cc_version = vfile.read().replace('\n', '')
+
+    if cc_version == "1.0" or cc_version == "1.1":
+        conf_file="/lib/systemd/system/nfs-server.service"
+    elif cc_version == "1.2":
+        conf_file="/etc/systemd/system/nfs-server.service.d/nfs-server.conf"
+    else:
+        conf_file="nfs-server config"
+
     with open('nfs-server-service.sh.stdout', 'r') as f:
         lines = f.readlines()
     foundTarget = False
@@ -14,12 +25,11 @@ def main():
         if 'Requires' in line and 'rpcbind.service' in line:
             foundService = True
     if foundTarget and not foundService:
-        print 'It appears rpcbind.target has been required in your /lib/systemd/system/nfs-server.service file. Instead, require rpcbind.service.'
+        print 'It appears rpcbind.target has been required in your %s file. Instead, require rpcbind.service.' % conf_file
     if foundTarget and foundService:
-        print 'It appears rpcbind.target and rpcbind.service have both been required in your /lib/systemd/system/nfs-server.service file. Require only rpcbind.service.'
+        print 'It appears rpcbind.target and rpcbind.service have both been required in your %s file. Require only rpcbind.service.' % conf_file
     if not foundTarget and not foundService:
-        print 'Require rpcbind.service in your /lib/systemd/system/nfs-server.service file.'
-        
+        print 'Require rpcbind.service in your %s file.' % conf_file
     
     
 if __name__ == '__main__':
