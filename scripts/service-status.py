@@ -4,6 +4,12 @@
 # zenoss-inspector-deps systemctl-status.sh get-ha-versions.sh
 # zenoss-inspector-tags docker serviced serviced-worker verify ha
 
+def print_time_sync_warning():
+    print "Please ensure you have some form of time synchronization in place on all hosts"
+    print "in your Zenoss environment."
+    print "If you have some other form of time synchronization in place, for instance a"
+    print "time-sync on your hypervisor, then it is safe to ignore this warning."
+
 
 class SystemService(object):
     def __init__(self, name="", description="", loaded=False, active=False, enabled=False):
@@ -17,8 +23,12 @@ class SystemService(object):
     def validateEnabledAndActive(self):
         if not self.enabled:
             print "System service '%s: %s' is not enabled to start at boot time" % (self.name, self.description)
+            if self.name.startswith("ntp"):
+                print_time_sync_warning()
         if not (self.loaded or self.active):
             print "System service '%s': %s' is not running" % (self.name, self.description)
+            if self.name.startswith("ntp"):
+                print_time_sync_warning()
 
     def validateDisabledAndStopped(self):
         if self.enabled:
@@ -108,6 +118,7 @@ def main():
 
     if not ntpInstalled:
         print "The ntp service is not installed"
+        print_time_sync_warning()
 
     if isHA:
         if not corosyncInstalled:
