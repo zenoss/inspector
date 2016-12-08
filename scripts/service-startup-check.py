@@ -4,10 +4,17 @@
 # zenoss-inspector-tags verify
 # zenoss-inspector-deps serviced-service-list-v.sh
 import json
+import os
+import sys
 from pprint import pprint
 
 def main():
-    with open('serviced-service-list-v.sh.stdout') as data_file:
+    data_file_name = 'serviced-service-list-v.sh.stdout'
+    if os.path.getsize(data_file_name) == 0:
+        print "Skipping this check because no services are deployed"
+        sys.exit(0)
+
+    with open(data_file_name) as data_file:
         data = json.load(data_file)
         #pprint(data)
         for i in data:
