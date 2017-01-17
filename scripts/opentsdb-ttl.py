@@ -4,13 +4,18 @@
 # zenoss-inspector-tags rm opentsdb verify ZEN-22981
 
 import subprocess as sp
+import sys
 
 
 def run(cmd):
     p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
     if p.returncode != 0:
-        raise sp.CalledProcessError(p.returncode, ' '.join(cmd))
+        if "service not found" in stderr:
+            print "Check for opentsdb TTL skipped; the service named 'writer' was not found"
+            sys.exit(0)
+	else:
+            raise sp.CalledProcessError(p.returncode, ' '.join(cmd))
     return stdout, stderr
 
 
