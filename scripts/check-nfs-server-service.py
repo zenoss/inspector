@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-deps nfs-server-service.sh serviced-major-minor-version.sh
+# zenoss-inspector-tags config serviced serviced-worker verify
 # zenoss-inspector-info
 
 
@@ -10,10 +11,8 @@ def main():
 
     if cc_version == "1.0" or cc_version == "1.1":
         conf_file="/lib/systemd/system/nfs-server.service"
-    elif cc_version == "1.2":
-        conf_file="/etc/systemd/system/nfs-server.service.d/nfs-server.conf"
     else:
-        conf_file="nfs-server config"
+        conf_file="/etc/systemd/system/nfs-server.service.d/nfs-server.conf"
 
     with open('nfs-server-service.sh.stdout', 'r') as f:
         lines = f.readlines()
@@ -30,7 +29,7 @@ def main():
         print 'It appears rpcbind.target and rpcbind.service have both been required in your %s file. Require only rpcbind.service.' % conf_file
     if not foundTarget and not foundService:
         print 'Require rpcbind.service in your %s file.' % conf_file
-    
-    
+
+
 if __name__ == '__main__':
     main()
