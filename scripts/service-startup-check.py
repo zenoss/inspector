@@ -2,11 +2,28 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-tags verify
-# zenoss-inspector-deps serviced-service-list-v.sh
+# zenoss-inspector-deps serviced-running.sh serviced-service-deployed.sh serviced-service-list-v.sh
+
 import json
+import sys
+
 from pprint import pprint
 
 def main():
+    cc_running = ""
+    with open('serviced-running.sh.stdout', 'r') as f:
+        cc_running = f.read().strip()
+    if cc_running == "SERVICED_RUNNING=false":
+        print "Serviced is not running; skipping check for service startup commands."
+        sys.exit(0)
+
+    services_deployed = ""
+    with open('serviced-service-deployed.sh.stdout', 'r') as f:
+        services_deployed = f.read().strip()
+    if services_deployed == "SERVICES_DEPLOYED=false":
+        print "No Zenoss services deployed; skipping check for service startup commands."
+        sys.exit(0)
+
     with open('serviced-service-list-v.sh.stdout') as data_file:
         data = json.load(data_file)
         #pprint(data)

@@ -2,7 +2,9 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-tags rm opentsdb verify ZEN-22981
+# zenoss-inspector-deps serviced-running.sh serviced-service-deployed.sh
 
+import sys
 import subprocess as sp
 
 
@@ -10,11 +12,29 @@ def run(cmd):
     p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
     if p.returncode != 0:
-        raise sp.CalledProcessError(p.returncode, ' '.join(cmd))
+        if "service not found" in stderr:
+            print "The service named 'writer' was not found; skipping check for opentsdb TTL."
+            sys.exit(0)
+        else:
+            raise sp.CalledProcessError(p.returncode, ' '.join(cmd))
     return stdout, stderr
 
 
 def main():
+    cc_running = ""
+    with open('serviced-running.sh.stdout', 'r') as f:
+        cc_running = f.read().strip()
+    if cc_running == "SERVICED_RUNNING=false":
+        print "Serviced is not running; skipping check for opentsdb TTL."
+        sys.exit(0)
+
+    services_deployed = ""
+    with open('serviced-service-deployed.sh.stdout', 'r') as f:
+        services_deployed = f.read().strip()
+    if services_deployed == "SERVICES_DEPLOYED=false":
+        print "No Zenoss services deployed; skipping check for opentsdb TTL."
+        sys.exit(0)
+
     cmd = ["serviced", "service", "shell", "writer",
            "bash", "-c", "echo list|/opt/hbase/bin/hbase shell"]
     stdout, stderr = run(cmd)
