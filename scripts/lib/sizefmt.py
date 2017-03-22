@@ -33,6 +33,16 @@ SIZES = {
 }
 decimapAbbrs = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 binaryAbbrs = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+# Not the most intuitive regular expression.  Groups here will be:
+# group(1): None or "-" for negative numbers
+# group(2): The numeric part of the string, ie "10.3"
+# group(3): [unused] the decimal portion for floats, ie ".3"
+# group(4): (The first letter denoting the unit "G", "k", "M", etc)
+# group(5): None or "i" if this is given in binary abbreviations. If provided
+#           then group(4) is forced lowercase (10 GiB is translatd to 10 gb)
+#           for the purpose of looking up the value in the SIZES dictionary.
+# group(6): None, "b", or "B".  Will always be "b" for SIZES lookups.
 sizeRegex = re.compile("^([-]?)(\d+(.\d+)?) ?([KkMmGgTtPp])?(i)?([Bb])?$")
 
 def parse_size(size):
@@ -76,6 +86,13 @@ def parse_size(size):
 
 
 def customsize(size, base, map):
+    """
+    Takes a number, a base (ie: 1000 for humansize or 1024 for
+    bytesize), and a map of abbreviations for the steps.  Returns
+    the number rounded to 3 decimal places matched to the abbreviation
+    it falls into.  See the comments in humansize() and bytesize()
+    for examples of the output.
+    """
     neg = 1 if size >= 0 else -1
     size = size * neg
     i = 0
