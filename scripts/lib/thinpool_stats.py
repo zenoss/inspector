@@ -22,12 +22,14 @@ import parse_config
 
 def get_serviced_settings(config):
     """
-    Returns the min data and metadata storage sizes.
+    Returns the min data and metadata storage sizes. CC interprets SERVICED_STORAGE_MIN_FREE
+    with base 1024, so we need to coerce the value when we parse it.
     """
     data = {}
     s_storage_min_free = config.get("SERVICED_STORAGE_MIN_FREE", "3G")
-    storage_min_free = sizefmt.parse_size(s_storage_min_free) or (3 * sizefmt.GB) # Default setting if we can't parse.
     data['SERVICED_STORAGE_MIN_FREE'] = s_storage_min_free
+    s_storage_min_free = s_storage_min_free.lower() # coerce to base 1024 to match CC interpretation.
+    storage_min_free = sizefmt.parse_size(s_storage_min_free) or (3 * sizefmt.GiB) # Default setting if we can't parse.
     data['data_min_free'] = storage_min_free
     data['meta_min_free'] = int(storage_min_free * 0.02)
     return data
@@ -81,6 +83,25 @@ def get_tpool_stats(config):
     return data
 
 
+def get_tenant_stats():
+    """
+    Uses df to get free space for mounted tenant volumes (if any). df -h shows
+    base 1024 stats, so we need to parse these appropriately.
+    """
+    data = { 'tenants': [] }
+    cmd = "df -h --output=avail,target | grep /opt/serviced/var/volumes 2>/dev/null || true"
+    stats = subprocess.check_output(cmd, shell=True)
+    if not stats:
+        return data
+    for line in [s.strip() for s in stats.split('\n') if s != '']:
+        line = line.split(' ')
+        if len(line) != 2: continue
+        tenant = line[1].split('/')[-1]
+        free = sizefmt.parse_size(line[0].lower())
+        data['tenants'].append({ 'id': tenant, 'free': free })
+    return data
+
+
 def get_thinpool_data():
     """
     Returns a map of data for the serviced thin pool.
@@ -88,6 +109,7 @@ def get_thinpool_data():
     config = parse_config.parse_serviced_config()
     data = get_serviced_settings(config)
     data.update(get_tpool_stats(config))
+    data.update(get_tenant_stats())
     return data
 
 

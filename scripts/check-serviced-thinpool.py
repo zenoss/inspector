@@ -41,10 +41,17 @@ def check_thinpool():
     err = ""
     if stats['data_free'] < stats['data_min_free']:
         err += "\nThe thinpool storage free (%s) is under the minimum threshold (%s)" % \
-            (sizefmt.humansize(stats['data_free']), sizefmt.humansize(stats['data_min_free']))
+            (sizefmt.bytesize(stats['data_free']), sizefmt.bytesize(stats['data_min_free']))
     if stats['meta_free'] < stats['meta_min_free']:
         err += "\nThe thinpool metadata free (%s) is under the minimum threshold (%s)" % \
-            (sizefmt.humansize(stats['meta_free']), sizefmt.humansize(stats['meta_min_free']))
+            (sizefmt.bytesize(stats['meta_free']), sizefmt.bytesize(stats['meta_min_free']))
+    if len(stats['tenants']):
+        for tenant in stats['tenants']:
+            if tenant['free'] < stats['data_min_free']:
+                err += "\nThe tenant volume %s available space (%s) is under the minimum threshold (%s)" % \
+                    (tenant['id'], sizefmt.bytesize(tenant['free']), sizefmt.bytesize(stats['data_min_free']))
+    else:
+        err += "\nNo tenant devices are mounted. Unable to verify tenant free space."
     return err
 
 
