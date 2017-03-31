@@ -2,7 +2,7 @@
 
 # zenoss-inspector-info
 # zenoss-inspector-deps systemctl-status.sh get-ha-versions.sh
-# zenoss-inspector-tags docker serviced serviced-worker verify ha
+# zenoss-inspector-tags docker serviced serviced-delegate verify ha
 
 def print_time_sync_warning():
     print "Please ensure you have some form of time synchronization in place on all hosts"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags serviced serviced-worker ha verify
+# zenoss-inspector-tags serviced serviced-delegate ha verify
 
 #
 # Filter the CC configuration to exclude comments and blank links.

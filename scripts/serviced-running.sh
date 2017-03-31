@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags verify serviced-worker
+# zenoss-inspector-tags verify serviced-delegate
 # zenoss-inspector-deps systemctl-status.sh
 
 SERVICED_RUNNING=false

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags serviced serviced-worker ha verify
+# zenoss-inspector-tags serviced serviced-delegate ha verify
 
 #
 # Capture the complete contents of the configuration so we can see

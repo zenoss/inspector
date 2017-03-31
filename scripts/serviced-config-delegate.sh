@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # zenoss-inspector-info
-# zenoss-inspector-tags config serviced serviced-worker verify
+# zenoss-inspector-tags config serviced serviced-delegate verify
 # zenoss-inspector-deps serviced-config.sh serviced-major-minor-version.sh
 
 # Verify that if this is a master node, that it is also an agent
