@@ -50,6 +50,25 @@ Compressing results: inspected-2015-10-09T12-48-47.054684.tar.gz
 Cleaning up...
 ```
 
+### Running only verification checks
+Inspector has two main functions - it collects a wide variety of information that might be useful when
+doing root-cause analysis on a problem, and it verifies a number of install and operational requirements.
+
+To run just the verification steps, use the following:
+```
+$ ./inspect -w verify
+```
+
+### Inspecting CC delegate nodes
+Inspector assumes the target is a CC master node.  It can be run on a CC delegate node, but will produce
+a number of complaints that are not relevant on a CC delegate.
+For instance, the storage configuration on a CC delegate node is much simpler.
+
+To run only the checks that make sense for a CC delegate node use:
+```
+$ ./inspect-delegate.sh
+```
+
 ### Inspecting with options
 Inspections can be performed with a handful of options. To use inspector in this fashion, just
 download the master branch, unzip it, and run inspect:
