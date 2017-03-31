@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# zenoss-inspector-tags docker serviced serviced-worker verify ha
+# zenoss-inspector-tags docker serviced serviced-delegate verify ha
 # zenoss-inspector-deps get-ha-versions.sh
 
 systemctl show --property=Names,Description,LoadState,ActiveState,UnitFileState dnsmasq

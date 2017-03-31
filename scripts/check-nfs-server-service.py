@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # zenoss-inspector-deps nfs-server-service.sh serviced-major-minor-version.sh
-# zenoss-inspector-tags config serviced serviced-worker verify
+# zenoss-inspector-tags config serviced serviced-delegate verify
 # zenoss-inspector-info
 
 

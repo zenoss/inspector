@@ -1,6 +1,13 @@
 #!/bin/bash
 
-# zenoss-inspector-tags rpm ha verify
+#
+# Even though there is nothing HA-specific about CC delegates, we need to include
+# the serviced-delegate tag because some generic collection scripts rely on
+# this script to tell them whether they need additional/different checks for
+# HA. For example, see systemctl-status.sh.
+#
+
+# zenoss-inspector-tags rpm ha serviced-delegate verify
 # zenoss-inspector-deps get-rpms.sh
 
 HAS_DRBD=false

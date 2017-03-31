@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# zenoss-inspector-tags verify
+# zenoss-inspector-tags serviced-delegate verify
 #
 
 pvs --all

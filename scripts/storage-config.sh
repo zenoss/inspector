@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# zenoss-inspector-tags verify
+# zenoss-inspector-tags serviced-delegate verify
 #
 # This script captures information about the OS storage configuration on the
 # host machine. See also pvs.sh, vgs.sh and lvs.sh
