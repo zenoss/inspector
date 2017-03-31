@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# zenoss-inspector-tags rpm docker ha verify os
+# zenoss-inspector-tags rpm docker ha os serviced-delegate verify
 rpm -qa
