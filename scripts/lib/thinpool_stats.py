@@ -19,6 +19,7 @@ import subprocess
 import sizefmt
 import parse_config
 
+LANG="LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8"
 
 def get_serviced_settings(config):
     """
@@ -74,7 +75,8 @@ def get_tpool_stats(config):
     Returns a mapping representing data for the serviced thinpool.
     """
     thinpooldev = config.get("SERVICED_DM_THINPOOLDEV", "serviced")
-    cmd = "lvs -o lv_size,data_percent,lv_metadata_size,metadata_percent %s 2>/dev/null | grep -vi lsize" % thinpooldev
+    cmd = "%s lvs -o lv_size,data_percent,lv_metadata_size,metadata_percent %s 2>/dev/null | grep -vi lsize" % \
+            (LANG, thinpooldev)
     stats = subprocess.check_output(cmd, shell=True).strip()
     if not stats:
         return {}
