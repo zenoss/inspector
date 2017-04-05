@@ -22,4 +22,11 @@ then
     exit 0
 fi
 
-serviced-storage -v -v check -o=dm.thinpooldev=/dev/mapper/serviced-serviced--pool /opt/serviced/var/volumes
+THINPOOL_DEV_NAME=`grep SERVICED_DM_THINPOOLDEV= serviced-config.sh.stdout | awk -F'=' '{print $2}'`
+if [ -z "$THINPOOL_DEV_NAME" ]
+then
+    echo "ERROR: could find SERVICED_DM_THINPOOLDEV in serviced-config.sh.stdout"
+    exit 1
+fi
+
+serviced-storage -v -v check -o=dm.thinpooldev=$THINPOOL_DEV_NAME /opt/serviced/var/volumes
