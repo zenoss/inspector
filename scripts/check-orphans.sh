@@ -6,7 +6,10 @@
 
 grep 'Orphaned devices were found' get-orphans.sh.stdout 2>&1 >/dev/null
 if [ $? -eq 0 ]; then
+    THINPOOL_DEV_NAME=`grep SERVICED_DM_THINPOOLDEV= serviced-config.sh.stdout | awk -F'=' '{print $2}'`
+
     echo "WARNING: Orphaned devices were found. Use 'serviced-storage check --clean' to remove"
-    echo "         Check get-orphans.sh.stdout for information on which orphan(s) were found."
-    echo "         Check the Control Center Reference Guide for information on using serviced-storage."
+    echo "         e.g. 'serviced-storage check --clean -o=dm.thinpooldev=$THINPOOL_DEV_NAME /opt/serviced/var/volumes'"
+    echo "         See get-orphans.sh.stdout for information on which orphan(s) were found."
+    echo "         See the Control Center Reference Guide for information on using serviced-storage."
 fi
