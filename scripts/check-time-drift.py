@@ -19,7 +19,7 @@ def main():
             ehost += 1
             # The name of the host is not recorded during an error
     if ehost > 0:
-        print 'WARN: %i host could not be reached for time-drift.' % ehost
+        print 'WARN: %i host(s) could not be reached for time-drift.' % ehost
     # Check for issues with time-drift
     host = "none"
     hostb = "none"
@@ -29,7 +29,6 @@ def main():
             host = line.split()[-1]
             checkTime = False
             if host == hostb:
-                ehost -= 1
                 print 'WARN: resource pool member %s could not be reached.' % hostb
             hostb = host
         if 'sec' in line:
