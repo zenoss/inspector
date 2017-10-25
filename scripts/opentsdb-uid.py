@@ -67,7 +67,7 @@ def main():
     multiples = [v for _, v in d.items() if len(v) > 1]
     mc = len(multiples)
     if mc > 0:
-        print "OpenTSDB UIDs are corrupt. There are {} UIDs with multiple " \
+        print "Some OpenTSDB UIDs are corrupt. There are {} UIDs with multiple " \
               "mappings. Contact Zenoss support for assistance.".format(mc)
 
 
