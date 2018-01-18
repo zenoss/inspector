@@ -10,7 +10,7 @@ CC_VERSION=$(cat serviced-major-minor-version.sh.stdout)
 if [[ $CC_VERSION == "1.0" || $CC_VERSION == "1.1" ]]
 then
     [[ -f /lib/systemd/system/nfs-server.service ]] && cat /lib/systemd/system/nfs-server.service
-elif [[ $CC_VERSION > "1.4" ]]
+elif [[ $CC_VERSION >= "1.5" ]]
 then
     exit
 else
