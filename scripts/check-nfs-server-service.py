@@ -28,7 +28,8 @@ def main():
     if foundTarget and foundService:
         print 'It appears rpcbind.target and rpcbind.service have both been required in your %s file. Require only rpcbind.service.' % conf_file
     if not foundTarget and not foundService:
-        print 'Require rpcbind.service in your %s file.' % conf_file
+        if cc_version < "1.5":
+            print 'Require rpcbind.service in your %s file.' % conf_file
 
 
 if __name__ == '__main__':
