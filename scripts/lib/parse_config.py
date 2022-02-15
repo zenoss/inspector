@@ -19,12 +19,10 @@ def parse_serviced_config():
     with open('serviced-config.sh.stdout', 'r') as f:
         lines = f.readlines()
 
-    data = {}
+    config = {}
     for line in lines:
         line = line.strip()
-        if line.startswith('#'):
-            continue
-
-        split = line.split("=")
-        data[split[0].strip()] = split[1].strip()
-    return data
+        if "=" in line and not line.strip().startswith("#"):
+            data = line.split("=", 1)
+            config[data[0].strip()] = data[1].strip()
+    return config
