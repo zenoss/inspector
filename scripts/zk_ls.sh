@@ -1,8 +1,9 @@
 #!/bin/bash
-# zenoss-inspector-tags serviced zookeeper
-# Needs the docker CLI and a running serviced-isvcs_zookeeper container.
+# zenoss-inspector-tags serviced zookeeper docker
+# zenoss-inspector-deps ps-aux.sh
+# Needs Docker running (per ps-aux.sh.stdout) and serviced-isvcs_zookeeper.
 # zk_ls.txt lists every znode path. zk_counts.txt has "<path> <count>" for /
-# and each top-level znode, where count is all znodes below it.
+# and each top-level znode (from its own "ls /"), counting all znodes below it.
 # zkCli connects to 127.0.0.1:${ZK_CLIENT_PORT:-2181} inside the container.
 # If serviced uses ZooKeeper digest ACLs (SERVICED_ZOOKEEPER_ACL_USER and
 # SERVICED_ZOOKEEPER_ACL_PASSWD, from the environment or else from
@@ -10,8 +11,8 @@
 # "addauth digest" with them; the password goes to zkCli on stdin only.
 # Any failure (container missing, ZooKeeper down, zkCli error such as NoAuth,
 # count mismatch, credentials with whitespace or a user starting with '-')
-# exits non-zero; details are in zk_ls.err, and a failed step's output file is
-# renamed to <name>.partial.
+# exits non-zero; details are in zk_ls.err. Each step writes <name>.partial and
+# renames it to <name> only on success; zk_counts runs even if zk_ls failed.
 set -o pipefail
 ERRORS=zk_ls.err
 # zkCli errors on stderr. zkCli's exit status is that of its last command, so
@@ -73,7 +74,7 @@ function zk_check {
 }
 
 function zk_ls {
-    local OUTPUT=zk_ls.txt
+    local OUTPUT=zk_ls.txt.partial
     local status
     { zk_auth; echo 'ls -R /'; } |
         docker exec -i serviced-isvcs_zookeeper bash -c \
@@ -85,12 +86,27 @@ function zk_ls {
         echo "zk_ls: no znode paths in zkCli output" >>$ERRORS
         return 1
     fi
+    mv -f $OUTPUT zk_ls.txt
 }
 
 function zk_counts {
-    local OUTPUT=zk_counts.txt
+    local OUTPUT=zk_counts.txt.partial
     local paths status
-    paths=$(awk 'NR == 1 {print "/"} /^\/[^\/]+$/' zk_ls.txt)
+    # zkCli prints "ls /" as one "[a, b, zookeeper]" line. Paths come from this
+    # session, not zk_ls.txt, so the counts do not depend on zk_ls's output.
+    { zk_auth; echo 'ls /'; } |
+        docker exec -i serviced-isvcs_zookeeper bash -c \
+            '$ZK_PATH/bin/zkCli.sh -server 127.0.0.1:${ZK_CLIENT_PORT:-2181}' 2>"$TMP_ERR" |
+        sed -E 's/^(\[zk: [^]]*\] *)+//' |
+        awk '/^\[.*\]$/ {lists++; gsub(/^\[|\]$/, ""); n = split($0, name, ", ")}
+            END {if (lists != 1 || n == 0) exit 1; print "/"; for (i = 1; i <= n; i++) print "/" name[i]}' >"$TMP_PATHS"
+    status=("${PIPESTATUS[@]}")
+    zk_check "$TMP_ERR" "${status[1]}" zk_counts || return 1
+    if [ "${status[3]}" -ne 0 ]; then
+        echo "zk_counts: no top-level paths from zkCli ls /" >>$ERRORS
+        return 1
+    fi
+    paths=$(<"$TMP_PATHS")
     # One zkCli session runs the commands from stdin and prints each count
     # after its prompt(s), in order, without naming the path; pair them by order.
     { zk_auth; sed 's/^/getAllChildrenNumber /' <<<"$paths"; } |
@@ -107,6 +123,7 @@ function zk_counts {
         echo "zk_counts: got a different number of counts than paths" >>$ERRORS
         return 1
     fi
+    mv -f $OUTPUT zk_counts.txt
 }
 
 # zkCli splits its input on whitespace and parses a leading '-' as an option,
@@ -117,22 +134,28 @@ function zk_creds_ok {
     case $ACL_PASSWD in *[[:space:]]*) return 1 ;; esac
 }
 
-# On failure, keep a step's output for support, but never under its success name.
 function failed {
-    [ -e "$2" ] && mv -f "$2" "$2.partial"
     echo "$1 failed; see zk_ls.err" >&2
-    exit 1
 }
 
-TMP_ERR=$(mktemp) || exit 1
-trap 'rm -f "$TMP_ERR"' EXIT
 : >$ERRORS
 rm -f zk_ls.txt zk_counts.txt zk_ls.txt.partial zk_counts.txt.partial
+# The same check as docker-stats.sh, before any docker call.
+egrep "(docker -d|docker daemon|dockerd)" ps-aux.sh.stdout &>/dev/null
+if [ $? -ne 0 ]; then
+    echo "Docker doesn't appear to be running." | tee -a $ERRORS >&2
+    exit 1
+fi
+TMP_ERR=$(mktemp) && TMP_PATHS=$(mktemp) || exit 1
+trap 'rm -f "$TMP_ERR" "$TMP_PATHS"' EXIT
 DEFAULTS=${SERVICED_DEFAULTS:-/etc/default/serviced}
 [ -e "$DEFAULTS" ] && [ ! -r "$DEFAULTS" ] && echo "zk_ls: cannot read $DEFAULTS; ACL credentials not loaded from it" >>$ERRORS
 if ! zk_creds_ok; then
     echo "zk_ls: ACL credentials contain whitespace or start with '-'; zkCli cannot pass them" >>$ERRORS
-    failed zk_ls zk_ls.txt
+    failed zk_ls
+    exit 1
 fi
-zk_ls || failed zk_ls zk_ls.txt
-zk_counts || failed zk_counts zk_counts.txt
+RC=0
+zk_ls || { failed zk_ls; RC=1; }
+zk_counts || { failed zk_counts; RC=1; }
+exit $RC
